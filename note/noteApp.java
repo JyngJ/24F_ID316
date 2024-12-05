@@ -20,6 +20,8 @@ public class noteApp extends XApp {
         return this.mScenarioMgr;
     }
     
+    private noteEventListener mEventListener = null;
+    
     private XLogMgr mLogMgr = null;
     @Override
     public XLogMgr getLogMgr() {
@@ -32,6 +34,15 @@ public class noteApp extends XApp {
         this.mFrame = new JFrame("New Note App");
         this.mCanvas2D = new noteCanvas2D(this);
         this.mScenarioMgr = new noteScenarioMgr(this);
+        this.mEventListener = new noteEventListener(this);
+        this.mLogMgr = new XLogMgr();
+        this.mLogMgr.setPrintOn(true);
+        
+        //connect event listeners
+        this.mCanvas2D.addMouseListener(this.mEventListener);
+        this.mCanvas2D.addMouseMotionListener(this.mEventListener);
+        this.mCanvas2D.setFocusable(true);
+        this.mCanvas2D.addKeyListener(this.mEventListener);
         
         //build & show visual components
         this.mFrame.add(this.mCanvas2D);

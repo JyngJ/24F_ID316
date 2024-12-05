@@ -21,6 +21,9 @@ public class noteEventListener implements MouseListener, MouseMotionListener,
 
     @Override
     public void mousePressed(MouseEvent e) {
+        noteScene currScene = (noteScene) this.mNote.getScenarioMgr().getCurrScene();
+        currScene.handleMousePress(e);
+        this.mNote.getCanvas2D().repaint();
         // need to be fixed
 //        if(this.mNote.getPenMarkMgr().handleMousePress(e)){
 //            noteScene currScene = (noteScene) this.mNote.getScenarioMgr().getCurrScene();
@@ -31,6 +34,9 @@ public class noteEventListener implements MouseListener, MouseMotionListener,
     
     @Override
     public void mouseDragged(MouseEvent e) {
+        noteScene currScene = (noteScene) this.mNote.getScenarioMgr().getCurrScene();
+        currScene.handleMouseDrag(e);
+        this.mNote.getCanvas2D().repaint();
         // need to be fixed
 //        if(this.mNote.getPenMarkMgr().handleMouseDrag(e)){
 //            noteScene currScene = (noteScene) this.mNote.getScenarioMgr().getCurrScene();
@@ -42,6 +48,10 @@ public class noteEventListener implements MouseListener, MouseMotionListener,
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        noteScene currScene = 
+            (noteScene) this.mNote.getScenarioMgr().getCurrScene();
+        currScene.handleMouseRelease(e);
+        this.mNote.getCanvas2D().repaint();
         // need to be fixed
 //        if(this.mNote.getPenMarkMgr().handleMouseRelease(e)){
 //            noteScene currScene = 
@@ -76,17 +86,17 @@ public class noteEventListener implements MouseListener, MouseMotionListener,
     @Override
     public void keyPressed(KeyEvent e) {
         // need to be fixed
-//        noteScene currScene = (noteScene) this.mNote.getScenarioMgr().getCurrScene();
-//        currScene.handleKeyDown(e);
-//        this.mNote.getCanvas2D().repaint();
+        noteScene currScene = (noteScene) this.mNote.getScenarioMgr().getCurrScene();
+        currScene.handleKeyDown(e);
+        this.mNote.getCanvas2D().repaint();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         // need to be fixed
-//        noteScene currScene = (noteScene) this.mNote.getScenarioMgr().getCurrScene();
-//        currScene.handleKeyUp(e);
-//        this.mNote.getCanvas2D().repaint();
+        noteScene currScene = (noteScene) this.mNote.getScenarioMgr().getCurrScene();
+        currScene.handleKeyUp(e);
+        this.mNote.getCanvas2D().repaint();
     }
     
     @Override

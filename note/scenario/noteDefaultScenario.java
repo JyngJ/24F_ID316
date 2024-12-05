@@ -3,6 +3,7 @@ package note.scenario;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import note.noteApp;
 import x.*;
 import note.noteScene;
 
@@ -46,32 +47,43 @@ public class noteDefaultScenario extends XScenario {
 
         @Override
         public void handleMousePress(MouseEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         }
 
         @Override
         public void handleMouseDrag(MouseEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         }
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         }
 
         @Override
         public void handleKeyDown(KeyEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            noteApp note = (noteApp) this.mScenario.getApp();
+            int code = e.getKeyCode();
+            switch (code) {
+                case KeyEvent.VK_F:             // will be changed
+                    XCmdToChangeScene.execute(note, 
+                        noteFormulaScenario.FormulaReadyScene.getSingleton(), this);
+                    break;
+            }
         }
 
         @Override
         public void handleKeyUp(KeyEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            noteApp note = (noteApp) this.mScenario.getApp();
+            int code = e.getKeyCode();
+            switch (code) {
+//                case KeyEvent.VK_F:             // will be changed
+//                    XCmdToChangeScene.execute(note, 
+//                        noteFormulaScenario.FormulaReadyScene.getSingleton(), this);
+//                    break;
+            }
         }
 
         @Override
         public void updateSupportObjects() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+
         }
 
         @Override
