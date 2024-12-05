@@ -22,5 +22,5 @@ public abstract class noteEmptyScenario {
     
     protected void addScene(XScene scene) {
         this.mScenes.add(scene);
-    }
+    }   
 }
