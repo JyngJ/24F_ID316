@@ -26,10 +26,25 @@ public class noteCanvas2D extends JPanel{
     
     private noteApp mNote = null;
     
+    private  Color mCurrColorForCurve = null;
+    public void setCurrColorForPtCurve(Color c) {
+        this.mCurrColorForCurve = c;
+    }
+    
+    public Color getCurrColorForCurve() {
+        return this.mCurrColorForCurve;
+    }
+    
+    private Stroke mCurrStrokeForPtCurve = null;
+    public Stroke getCurrStrokeForPtCurve() {
+        return mCurrStrokeForPtCurve;
+    }
+    
     // Constructor for noteCanvas2D
     public noteCanvas2D(noteApp note){
         this.mNote = note;
-        
+        this.mCurrStrokeForPtCurve = noteCanvas2D.STROKE_PT_CURVE_DEFAULT;
+        this.mCurrColorForCurve = noteCanvas2D.COLOR_PT_CURVE_DEFAULT;
     }
     
     @Override
@@ -40,6 +55,9 @@ public class noteCanvas2D extends JPanel{
                 RenderingHints.VALUE_ANTIALIAS_ON);
         
         this.drawInfo(g2);
+        noteScene currScene = (noteScene) mNote.getScenarioMgr().getCurrScene();
+        currScene.renderWorldObjects(g2);
+        currScene.renderScreenObjects(g2);
     }
     
     // Display the current mode on the screen
