@@ -4,7 +4,13 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import note.noteApp;
+import note.noteCanvas2D;
+import note.noteFormula;
+import note.noteFormulaAtom;
+import note.noteFormulaEdge;
+import note.noteFormulaMgr;
 import note.noteScene;
 import x.XApp;
 import x.XCmdToChangeScene;
@@ -50,10 +56,46 @@ public class noteFormulaScenario extends XScenario {
         
         @Override
         public void handleMousePress(MouseEvent e) {
-           noteApp note = (noteApp) this.mScenario.getApp();
-//           Point pt = e.getPoint();
-           
-           XCmdToChangeScene.execute(note,
+            noteApp note = (noteApp) this.mScenario.getApp();
+            noteFormulaMgr formulaMgr = note.getFormulaMgr();
+
+            // 클릭 위치 가져오기
+            Point pt = e.getPoint();
+
+            // Formula 리스트에서 클릭 위치가 Atom의 터치 영역에 있는지 확인
+            for (noteFormula formula : formulaMgr.getFormulas()) {
+                for (noteFormulaAtom atom : formula.getAtoms()) {
+                    if (atom.getTouchArea().contains(pt)) {
+                        // 클릭 위치가 Atom의 터치 영역 안에 있음
+                        formulaMgr.setCurrAtom(atom);
+                        formulaMgr.setCurrFormula(formula);
+
+                        System.out.println("Clicked on existing Atom at: " + atom.getPosition());
+
+                        // 씬 전환
+                        XCmdToChangeScene.execute(note,
+                            noteFormulaScenario.FormulaDrawScene.getSingleton(), this.mReturnScene);
+                        return;
+                    }
+                }
+            }
+
+            // 클릭 위치에 Atom이 없으면 새로운 Atom 생성
+            noteFormulaAtom newAtom = new noteFormulaAtom(
+                "C",
+                new Point2D.Double(pt.x, pt.y));
+
+            // 새로운 Formula 생성
+            noteFormula newFormula = new noteFormula();
+            newFormula.addAtom(newAtom);
+
+            formulaMgr.setCurrAtom(newAtom);
+            formulaMgr.setCurrFormula(newFormula);
+
+            System.out.println("Created new Atom at (" + pt.x + ", " + pt.y + ") and added to a new Formula.");
+
+            // 씬 전환
+            XCmdToChangeScene.execute(note,
                 noteFormulaScenario.FormulaDrawScene.getSingleton(), this.mReturnScene);
         }
 
@@ -128,7 +170,7 @@ public class noteFormulaScenario extends XScenario {
         
         @Override
         public void handleMousePress(MouseEvent e) {
-           
+
         }
 
         @Override
@@ -139,6 +181,28 @@ public class noteFormulaScenario extends XScenario {
         @Override
         public void handleMouseRelease(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
+            
+            int mouseX = e.getX();
+            int mouseY = e.getY();
+
+            // Atom 생성 (타입: C)
+            noteFormulaAtom newAtom = new noteFormulaAtom(
+                "C",
+                new Point2D.Double(mouseX, mouseY));
+            
+            noteFormulaAtom currAtom = note.getFormulaMgr().getCurrAtom();
+            
+            noteFormulaEdge newEdge = new noteFormulaEdge(currAtom , newAtom);
+            
+            noteFormula currFormula = note.getFormulaMgr().getCurrFormula();
+            
+            currFormula.addAtom(newAtom);
+            currFormula.addEdge(newEdge);
+            
+            note.getFormulaMgr().getFormulas().add(currFormula);
+            note.getFormulaMgr().setCurrFormula(null);
+            note.getFormulaMgr().setCurrAtom(null);
+            
             XCmdToChangeScene.execute(note,
                 noteFormulaScenario.FormulaReadyScene.getSingleton(), this.mReturnScene);
         }
