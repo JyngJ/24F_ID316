@@ -60,4 +60,5 @@ public class noteFormulaAtom {
             tr * 2
         );
     }
+
 }
