@@ -11,8 +11,11 @@ import note.noteApp;
 import note.noteCanvas2D;
 import note.noteFormula;
 import note.noteFormulaAtom;
-import note.noteFormulaEdge;
+import note.noteFormulaAtomTemp;
+import note.noteFormulaEdgeSingle;
+import note.noteFormulaEdgeTemp;
 import note.noteFormulaMgr;
+import note.noteFormulaRenderer;
 import note.noteScene;
 import x.XApp;
 import x.XCmdToChangeScene;
@@ -74,6 +77,11 @@ public class noteFormulaScenario extends XScenario {
                         // 클릭 위치가 Atom의 터치 영역 안에 있음
                         formulaMgr.setCurrAtom(atom);
                         formulaMgr.setCurrFormula(formula);
+                        
+                        noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("temp", point2D);
+                        formulaMgr.setAtomTemp(tempAtom);
+                        noteFormulaEdgeTemp tempEdge = new noteFormulaEdgeTemp(atom, tempAtom);
+                        formulaMgr.setEdgeTemp(tempEdge);
 
                         // 씬 전환
                         XCmdToChangeScene.execute
@@ -91,6 +99,11 @@ public class noteFormulaScenario extends XScenario {
             formulaMgr.setCurrAtom(newAtom);
             formulaMgr.setCurrFormula(
                 formulaMgr.findFormulaForAtom(newAtom));
+            
+            noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("temp", point2D);
+            formulaMgr.setAtomTemp(tempAtom);
+            noteFormulaEdgeTemp tempEdge = new noteFormulaEdgeTemp(newAtom, tempAtom);
+            formulaMgr.setEdgeTemp(tempEdge);
 
             // 씬 전환
             XCmdToChangeScene.execute(note,
@@ -174,8 +187,30 @@ public class noteFormulaScenario extends XScenario {
 
         @Override
         public void handleMouseDrag(MouseEvent e) {
-        
+            noteApp note = (noteApp) this.mScenario.getApp();
+            noteFormulaMgr formulaMgr = note.getFormulaMgr();
+            noteCanvas2D canvas = note.getCanvas2D();
+
+            // 현재 마우스 위치
+            Point2D.Double currentPoint = new Point2D.Double(e.getX(), e.getY());
+
+            // 시작 Atom 가져오기
+            noteFormulaAtom currAtom = formulaMgr.getCurrAtom();
+            
+            formulaMgr.getAtopTemp().setPosition(currentPoint);
+
+            // 스냅 지점 계산
+            noteFormulaRenderer renderer = new noteFormulaRenderer(canvas);
+//            System.out.print(formulaMgr.getAtopTemp().getPosition());
+            Point2D.Double snapPoint = renderer.calculateSnapPoint(currAtom.getPosition(), formulaMgr.getAtopTemp().getPosition());
+            
+            // tempAtom을 스냅된 위치로 이동
+            formulaMgr.getAtopTemp().setPosition(snapPoint);
+
+            // 캔버스 다시 그리기
+            canvas.repaint();
         }
+
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
@@ -188,18 +223,20 @@ public class noteFormulaScenario extends XScenario {
 
             noteFormulaAtom currAtom = formulaMgr.getCurrAtom();
             noteFormula currFormula = formulaMgr.getCurrFormula();
-
+            
+            formulaMgr.setAtomTemp(null);
+            formulaMgr.setEdgeTemp(null);
+            
             for (noteFormula formula : formulaMgr.getFormulas()) {
                 for (noteFormulaAtom atom : formula.getAtoms()) {
                     if (atom.getTouchArea().contains(releasePoint)) {
                         // 두 Atom을 Edge로 연결
-                        noteFormulaEdge newEdge = new noteFormulaEdge(currAtom, atom);
+                        noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, atom);
                         currFormula.addEdge(newEdge);
 
                         // 두 Formula를 병합
                         noteCmdToMergeFormula.execute(note, currFormula, formula);
 
-                        // 씬 전환
                         formulaMgr.setCurrFormula(null);
                         formulaMgr.setCurrAtom(null);
 
@@ -214,13 +251,11 @@ public class noteFormulaScenario extends XScenario {
             noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, releasePoint);
 
             // 현재 Atom과 새 Atom을 Edge로 연결
-            noteFormulaEdge newEdge = new noteFormulaEdge(currAtom, newAtom);
+            noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, newAtom);
             currFormula.addEdge(newEdge);
 
             formulaMgr.setCurrFormula(null);
             formulaMgr.setCurrAtom(null);
-
-            System.out.println("Created new Atom and connected it.");
 
             XCmdToChangeScene.execute(note,
                 noteFormulaScenario.FormulaReadyScene.getSingleton(), this.mReturnScene);
@@ -236,9 +271,12 @@ public class noteFormulaScenario extends XScenario {
         @Override
         public void handleKeyUp(KeyEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
+            noteFormulaMgr formulaMgr = note.getFormulaMgr();
             int code = e.getKeyCode();
             switch (code) {
                 case KeyEvent.VK_F:             // will be changed
+                    formulaMgr.setAtomTemp(null);
+                    formulaMgr.setEdgeTemp(null);
                     XCmdToChangeScene.execute(note, 
                         mReturnScene, null);
                     break;
