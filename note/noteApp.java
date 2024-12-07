@@ -28,6 +28,12 @@ public class noteApp extends XApp {
          return this.mLogMgr;
     }
     
+    private noteFormulaMgr mFormulaMgr = null;
+    
+    public noteFormulaMgr getFormulaMgr() {
+        return this.mFormulaMgr;
+    }
+    
     public noteApp() {
         //create components
         // 1) frame 2) canvas
@@ -37,6 +43,7 @@ public class noteApp extends XApp {
         this.mEventListener = new noteEventListener(this);
         this.mLogMgr = new XLogMgr();
         this.mLogMgr.setPrintOn(true);
+        this.mFormulaMgr = new noteFormulaMgr();
         
         //connect event listeners
         this.mCanvas2D.addMouseListener(this.mEventListener);
