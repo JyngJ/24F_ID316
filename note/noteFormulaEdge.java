@@ -3,7 +3,7 @@ package note;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-public class noteFormulaEdge {
+public abstract class noteFormulaEdge {
     // 시작 Atom
     private noteFormulaAtom startAtom = null;
 

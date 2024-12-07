@@ -12,6 +12,22 @@ public class noteFormulaMgr {
         this.mCurrFormula = formula;
     }
     
+    private noteFormulaAtomTemp mTempAtom = null;
+    public noteFormulaAtomTemp getAtopTemp() {
+        return this.mTempAtom;
+    }
+    public void setAtomTemp(noteFormulaAtomTemp tempAtom) {
+        this.mTempAtom = tempAtom;
+    }
+    
+    private noteFormulaEdgeTemp mTempEdge = null;
+    public noteFormulaEdgeTemp getEdgeTemp() {
+        return this.mTempEdge;
+    }
+    public void setEdgeTemp(noteFormulaEdgeTemp tempEdge) {
+        this.mTempEdge = tempEdge;
+    }
+    
     // 현재 엣지가 시작되고 있는 atom
     private noteFormulaAtom mCurrAtom = null;
     public noteFormulaAtom getCurrAtom() {
@@ -46,4 +62,5 @@ public class noteFormulaMgr {
         }
         return null; // Atom이 어떤 Formula에도 속하지 않을 경우 null 반환
     }
+
 }
