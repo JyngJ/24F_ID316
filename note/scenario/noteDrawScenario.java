@@ -79,10 +79,10 @@ public class noteDrawScenario extends XScenario {
             if (currPtCurve != null && 
                     currPtCurve.getPts().size() > 1){
                 note.getPtCurveMgr().getPtCurves().add(currPtCurve);
+            }
             note.getPtCurveMgr().setCurrPtCurve(null);
             XCmdToChangeScene.execute(note, 
-                        noteDefaultScenario.ReadyScene.getSingleton(), null);
-            }
+                        noteDefaultScenario.ReadyScene.getSingleton(), this);
         }
 
         @Override
@@ -165,7 +165,7 @@ public class noteDrawScenario extends XScenario {
             this.dragPath.add(e.getPoint());
             noteCmdToErasePtCurve.execute(note, this.dragPath);
             this.dragPath.clear();
-            XCmdToChangeScene.execute(note, DrawScene.getSingleton(), null);
+            XCmdToChangeScene.execute(note, noteDefaultScenario.ReadyScene.getSingleton(), null);
         }
         
         @Override
@@ -182,17 +182,14 @@ public class noteDrawScenario extends XScenario {
 
         @Override
         public void updateSupportObjects() {
-            // Do nothing, drag path is not visualized.
         }
 
         @Override
         public void renderWorldObjects(Graphics2D g2) {
-            // Do nothing, drag path is not visualized.
         }
 
         @Override
         public void renderScreenObjects(Graphics2D g2) {
-            // Do nothing, drag path is not visualized.
         }
 
         @Override
