@@ -27,7 +27,7 @@ public class noteCmdToErasePtCurve extends XLoggableCmd {
         noteApp note = (noteApp) this.mApp;
         notePtCurveMgr curveMgr = note.getPtCurveMgr();
 
-        // 드래그 영역의 최소 Bounding Box
+        // 드래그 영역의 최소 Bounding Box 계산
         Rectangle2D.Double dragBox = this.getBoundingBox(this.dragPath);
 
         // 곡선 제거
