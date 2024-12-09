@@ -1,6 +1,7 @@
 package note;
 
 import java.awt.*;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 
 public class noteFormulaRenderer {
@@ -13,6 +14,38 @@ public class noteFormulaRenderer {
     public noteFormulaRenderer(noteCanvas2D canvas) {
         this.mCanvas2D = canvas;
     }
+    
+    // Drawing을 렌더링
+public void renderDrawing(noteApp note, Graphics2D g2) {
+    this.mNote = note;
+    notePtCurve currPtCurve = note.getPtCurveMgr().getCurrPtCurve();
+
+    if (currPtCurve != null) {
+        renderPtCurve(g2, currPtCurve);
+    }
+}
+
+// 단일 ptCurve를 렌더링
+public void renderPtCurve(Graphics2D g2, notePtCurve ptCurve) {
+    // ptCurve의 점 목록을 가져와 Path2D로 그리기
+    java.util.List<Point2D.Double> points = ptCurve.getPts();
+    if (points.size() > 1) {
+        Path2D path = new Path2D.Double();
+        Point2D.Double firstPoint = points.get(0);
+        path.moveTo(firstPoint.x, firstPoint.y);
+        
+        for (int i = 1; i < points.size(); i++) {
+            Point2D.Double point = points.get(i);
+            path.lineTo(point.x, point.y);
+        }
+
+        // Stroke 및 Color 설정
+        g2.setColor(ptCurve.getColor());
+        g2.setStroke(ptCurve.getStroke());
+        g2.draw(path);
+    }
+}
+
     
     // 모든 Formulas를 렌더링
     public void renderFormulas(noteApp note, Graphics2D g2) {
