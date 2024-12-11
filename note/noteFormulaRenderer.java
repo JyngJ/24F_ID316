@@ -22,9 +22,23 @@ public class noteFormulaRenderer {
     // 모든 Formulas를 렌더링
     public void renderFormulas(noteApp note, Graphics2D g2) {
         this.mNote = note;
+
+        // 기존 Formula 렌더링
         for (noteFormula formula : note.getFormulaMgr().getFormulas()) {
             renderFormula(g2, formula);
         }
+
+        // 현재 작업 중인 prevEdge와 prevAtom 렌더링
+        noteFormulaMgr formulaMgr = note.getFormulaMgr();
+        for (noteFormulaEdge edge : formulaMgr.getPrevEdges()) {
+            renderEdges(g2, edge);
+        }
+        for (noteFormulaAtom atom : formulaMgr.getPrevAtoms()) {
+            renderAtom(g2, atom);
+        }
+
+        // 임시 Edge 렌더링
+        drawEdgeTemp(g2);
     }
 
     // Formula를 그리는 메서드
@@ -43,13 +57,15 @@ public class noteFormulaRenderer {
     // Atom 그리기
     private void renderAtom(Graphics2D g2, noteFormulaAtom atom) {
         g2.setColor(Color.BLACK); // Atom 기본 색상
-//        g2.fill(atom.getTouchArea()); // Atom 영역��� 채움
-
-        // Atom 타입 텍스트 렌더링
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.PLAIN, 12));
         Point2D.Double position = atom.getPosition();
-//        g2.drawString(atom.getType(), (float) position.x - 4, (float) position.y + 4);
+
+        // Atom 위치에 점 그리기
+        g2.fillOval((int) (position.x - 3), (int) (position.y - 3), 6, 6);
+
+        // 디버깅용 라벨 "A" 표시
+        g2.setColor(Color.RED);
+        g2.setFont(new Font("Arial", Font.PLAIN, 12));
+        g2.drawString("A", (float) position.x + 5, (float) position.y - 5);
     }
 
     // Edge 그리기
@@ -67,7 +83,12 @@ public class noteFormulaRenderer {
                 drawEdgeTriple(g2, start, end);
         }
 
-        drawEdgeTemp(g2);
+        // 디버깅용 라벨 "E" 표시
+        g2.setColor(Color.RED);
+        g2.setFont(new Font("Arial", Font.PLAIN, 12));
+        double midX = (start.x + end.x) / 2;
+        double midY = (start.y + end.y) / 2;
+        g2.drawString("E", (float) midX + 5, (float) midY - 5);
     }
 
     // 단일 결합 Edge
@@ -204,5 +225,71 @@ public class noteFormulaRenderer {
         double snappedDy = length * Math.sin(angle);
 
         return new Point2D.Double(start.x + snappedDx, start.y + snappedDy);
+    }
+
+    public void arrangeFormulas() {
+        noteFormulaMgr formulaMgr = this.mNote.getFormulaMgr();
+        ArrayList<noteFormula> formulas = formulaMgr.getFormulas();
+
+        for (noteFormula formula : formulas) {
+            ArrayList<noteFormulaEdge> edges = formula.getEdges();
+            ArrayList<noteFormulaAtom> atoms = formula.getAtoms();
+
+            // 1. 외따로 있는 atom 제거 (edge가 없는 atom)
+            edges.removeIf(edge -> {
+                return edge.getStartAtom() == null || edge.getEndAtom() == null;
+            });
+
+            // 2. 중복 edge 제거 (같은 atom 쌍을 연결하는 edge)
+            for (int i = edges.size() - 1; i >= 0; i--) {
+                noteFormulaEdge edge1 = edges.get(i);
+                for (int j = i - 1; j >= 0; j--) {
+                    noteFormulaEdge edge2 = edges.get(j);
+                    if (hasSameAtoms(edge1, edge2)) {
+                        edges.remove(i);
+                        break;
+                    }
+                }
+            }
+
+            // 3. 같은 위치의 atom 병합
+            for (int i = atoms.size() - 1; i >= 0; i--) {
+                noteFormulaAtom atom1 = atoms.get(i);
+                for (int j = i - 1; j >= 0; j--) {
+                    noteFormulaAtom atom2 = atoms.get(j);
+                    if (isSamePosition(atom1, atom2)) {
+                        // atom2에 연결된 모든 edge를 atom1으로 연결
+                        redirectEdges(edges, atom2, atom1);
+                        atoms.remove(j);
+                        i--; // 인덱스 조정
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean hasSameAtoms(noteFormulaEdge edge1, noteFormulaEdge edge2) {
+        return (edge1.getStartAtom() == edge2.getStartAtom()
+                && edge1.getEndAtom() == edge2.getEndAtom())
+                || (edge1.getStartAtom() == edge2.getEndAtom()
+                && edge1.getEndAtom() == edge2.getStartAtom());
+    }
+
+    private boolean isSamePosition(noteFormulaAtom atom1, noteFormulaAtom atom2) {
+        Point2D.Double pos1 = atom1.getPosition();
+        Point2D.Double pos2 = atom2.getPosition();
+        return pos1.distance(pos2) < 1.0; // 1픽셀 이내면 같은 위치로 간주
+    }
+
+    private void redirectEdges(ArrayList<noteFormulaEdge> edges,
+            noteFormulaAtom oldAtom, noteFormulaAtom newAtom) {
+        for (noteFormulaEdge edge : edges) {
+            if (edge.getStartAtom() == oldAtom) {
+                edge.setStartAtom(newAtom);
+            }
+            if (edge.getEndAtom() == oldAtom) {
+                edge.setEndAtom(newAtom);
+            }
+        }
     }
 }

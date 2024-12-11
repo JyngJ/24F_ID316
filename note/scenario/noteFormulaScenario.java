@@ -5,13 +5,14 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import note.cmd.noteCmdToCreateAtom;
-import note.cmd.noteCmdToMergeFormula;
 import note.noteApp;
 import note.noteCanvas2D;
 import note.noteFormula;
 import note.noteFormulaAtom;
 import note.noteFormulaAtomTemp;
+import note.noteFormulaEdge;
 import note.noteFormulaEdgeSingle;
 import note.noteFormulaEdgeTemp;
 import note.noteFormulaMgr;
@@ -73,7 +74,7 @@ public class noteFormulaScenario extends XScenario {
             noteFormulaMgr formulaMgr = note.getFormulaMgr();
 
             // 클릭 위치 가져오기
-            Point pt = e.getPoint(); // MouseEvent에서 가져온 Point
+            Point pt = e.getPoint(); // MouseEvent���������서 가져온 Point
             Point2D.Double point2D
                     = new Point2D.Double(pt.x, pt.y);    //실수형으로 변환 
 
@@ -215,44 +216,7 @@ public class noteFormulaScenario extends XScenario {
             Point2D.Double currentPoint = new Point2D.Double(e.getX(), e.getY());
             noteFormulaAtom currAtom = formulaMgr.getCurrAtom();
 
-            // EdgeTemp 터치 확인 및 거리 체크
-            noteFormulaEdgeTemp edgeTemp = formulaMgr.getEdgeTemp();
-            if (edgeTemp != null && edgeTemp.containsPoint(currentPoint)) {
-                // 현재 마우스 위치와 currAtom과의 거리 계산
-                Point2D.Double startPos = currAtom.getPosition();
-                double dx = currentPoint.x - startPos.x;
-                double dy = currentPoint.y - startPos.y;
-                double distance = Math.sqrt(dx * dx + dy * dy);
-
-                // 거리가 충분할 경우 새 Atom과 Edge 생성
-                if (distance >= noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 4) {
-                    // AtomTemp 위치에 새 Atom 생성
-                    Point2D.Double tempPos = formulaMgr.getAtopTemp().getPosition();
-                    noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, tempPos);
-
-                    // 현재 Formula 가져오기
-                    noteFormula currFormula = formulaMgr.getCurrFormula();
-
-                    // 새 Edge 생성 및 Formula에 추가
-                    noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, newAtom);
-                    currFormula.addEdge(newEdge);
-
-                    // 이전 작업 리스트에 추가
-                    formulaMgr.addPrevEdge(newEdge);
-                    formulaMgr.addPrevAtom(newAtom);
-
-                    // currAtom을 새로 만든 Atom으로 변경
-                    formulaMgr.setCurrAtom(newAtom);
-
-                    // EdgeTemp 업데이트
-                    noteFormulaAtomTemp tempAtom = formulaMgr.getAtopTemp();
-                    formulaMgr.setEdgeTemp(new noteFormulaEdgeTemp(newAtom, tempAtom));
-
-                    canvas.repaint();
-                }
-            }
-
-            // 기존 코드 계속 실행
+            // 다른 Atom 위에 있는지 확인
             boolean isOverAtom = false;
             for (noteFormula formula : formulaMgr.getFormulas()) {
                 for (noteFormulaAtom atom : formula.getAtoms()) {
@@ -268,7 +232,70 @@ public class noteFormulaScenario extends XScenario {
                 }
             }
 
+            // EdgeTemp 터치 확인 및 거리 체크
             if (!isOverAtom) {
+                noteFormulaEdgeTemp edgeTemp = formulaMgr.getEdgeTemp();
+                if (edgeTemp != null && edgeTemp.containsPoint(currentPoint)) {
+                    // 현재 마우스 위치와 currAtom과의 거리 계산
+                    Point2D.Double startPos = currAtom.getPosition();
+                    double dx = currentPoint.x - startPos.x;
+                    double dy = currentPoint.y - startPos.y;
+                    double distance = Math.sqrt(dx * dx + dy * dy);
+
+                    // 거리가 충분할 경우 새 Atom과 Edge 생성
+                    if (distance >= noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 2) {
+                        // AtomTemp 위치에 새 Atom 생성
+                        Point2D.Double tempPos = formulaMgr.getAtopTemp().getPosition();
+                        noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, tempPos);
+
+                        // 새 Edge 생성 및 prev 리스트에 추가
+                        noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, newAtom);
+                        formulaMgr.addPrevEdge(newEdge);
+                        formulaMgr.addPrevAtom(newAtom);
+
+                        // currAtom을 새로 만든 Atom으로 변경
+                        formulaMgr.setCurrAtom(newAtom);
+
+                        // EdgeTemp 업데이트
+                        noteFormulaAtomTemp tempAtom = formulaMgr.getAtopTemp();
+                        formulaMgr.setEdgeTemp(new noteFormulaEdgeTemp(newAtom, tempAtom));
+
+                        canvas.repaint();
+                    }
+                } // 이전 엣지들 확인
+                else {
+                    ArrayList<noteFormulaEdge> prevEdges = formulaMgr.getPrevEdges();
+                    if (!prevEdges.isEmpty()) {
+                        noteFormulaEdge lastPrevEdge = prevEdges.get(prevEdges.size() - 1);
+                        if (lastPrevEdge.containsPoint(currentPoint)) {
+                            // 현재 마우스 위치와 currAtom과의 거리 계산
+                            Point2D.Double startPos = currAtom.getPosition();
+                            double dx = currentPoint.x - startPos.x;
+                            double dy = currentPoint.y - startPos.y;
+                            double distance = Math.sqrt(dx * dx + dy * dy);
+
+                            if (distance >= noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 3) {
+                                // 이전 상태로 복원
+                                noteFormulaAtom prevAtom = lastPrevEdge.getStartAtom();
+
+                                // prevEdges와 prevAtoms에서 마지막 항목들 제거
+                                prevEdges.remove(prevEdges.size() - 1);
+                                formulaMgr.removeAtom(currAtom);  // Atom 완전히 제거
+
+                                // 현재 작업 상태 업데이트
+                                formulaMgr.setCurrAtom(prevAtom);
+
+                                // 임시 객체 업데이트
+                                noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("temp", currentPoint);
+                                formulaMgr.setAtomTemp(tempAtom);
+                                noteFormulaEdgeTemp tempEdge = new noteFormulaEdgeTemp(prevAtom, tempAtom);
+                                formulaMgr.setEdgeTemp(tempEdge);
+                            }
+                        }
+                    }
+                }
+
+                // AtomTemp 위치 업데이트
                 formulaMgr.getAtopTemp().setPosition(currentPoint);
                 noteFormulaRenderer renderer = canvas.getRenderer();
                 Point2D.Double startPos = currAtom.getPosition();
@@ -312,18 +339,11 @@ public class noteFormulaScenario extends XScenario {
             for (noteFormula formula : formulaMgr.getFormulas()) {
                 for (noteFormulaAtom atom : formula.getAtoms()) {
                     if (atom.getTouchArea().contains(releasePoint)) {
-                        // 두 Atom을 Edge로 연결
+                        // 두 Atom을 Edge로 연결하고 prev 리스트에 추가
                         noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, atom);
-                        currFormula.addEdge(newEdge);
-                        formulaMgr.addPrevEdge(newEdge);  // 현재 엣지 리스트에 추가
+                        formulaMgr.addPrevEdge(newEdge);
 
-                        // 두 Formula를 병합
-                        noteCmdToMergeFormula.execute(note, currFormula, formula);
-
-                        formulaMgr.setCurrFormula(null);
-                        formulaMgr.setCurrAtom(null);
-                        formulaMgr.clearPrevElements();  // 현재 작업 리스트 초기화
-
+                        // 씬 전환
                         XCmdToChangeScene.execute(note,
                                 noteFormulaScenario.FormulaReadyScene.getSingleton(),
                                 this.mReturnScene);
@@ -336,15 +356,12 @@ public class noteFormulaScenario extends XScenario {
             Point2D.Double snapPosition = tempAtom.getPosition();
             noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, snapPosition);
 
-            // 현재 Atom과 새 Atom을 Edge로 연결
+            // 현재 Atom과 새 Atom을 Edge로 연결하고 prev 리스트에 추가
             noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, newAtom);
-            currFormula.addEdge(newEdge);
-            formulaMgr.addPrevEdge(newEdge);  // 현재 엣지 리스트에 추가
+            formulaMgr.addPrevEdge(newEdge);
+            formulaMgr.addPrevAtom(newAtom);
 
-            formulaMgr.setCurrFormula(null);
-            formulaMgr.setCurrAtom(null);
-            formulaMgr.clearPrevElements();  // 현재 작업 리스트 초기화
-
+            // 씬 전환
             XCmdToChangeScene.execute(note,
                     noteFormulaScenario.FormulaReadyScene.getSingleton(),
                     this.mReturnScene);
@@ -392,7 +409,29 @@ public class noteFormulaScenario extends XScenario {
 
         @Override
         public void wrapUp() {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            noteFormulaMgr formulaMgr = note.getFormulaMgr();
+            noteFormula currFormula = formulaMgr.getCurrFormula();
 
+            if (currFormula != null) {
+                // prevEdge와 prevAtom을 현재 Formula에 추가
+                for (noteFormulaEdge edge : formulaMgr.getPrevEdges()) {
+                    currFormula.addEdge(edge);
+                }
+                for (noteFormulaAtom atom : formulaMgr.getPrevAtoms()) {
+                    currFormula.addAtom(atom);
+                }
+            }
+
+            // Formula 정리
+            formulaMgr.arrangeFormulas();
+
+            // 작업 상태 초기화
+            formulaMgr.clearPrevElements();
+            formulaMgr.setCurrFormula(null);
+            formulaMgr.setCurrAtom(null);
+            formulaMgr.setAtomTemp(null);
+            formulaMgr.setEdgeTemp(null);
         }
     }
 
