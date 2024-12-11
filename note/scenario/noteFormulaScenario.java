@@ -224,14 +224,29 @@ public class noteFormulaScenario extends XScenario {
             }
 
             if (!isOverAtom) {
-                // Atom 위에 없으면 기존처럼 스냅
+                // Atom 위에 없으면 기존처럼 스냅하되, 길이는 고정
                 formulaMgr.getAtopTemp().setPosition(currentPoint);
                 noteFormulaRenderer renderer = new noteFormulaRenderer(canvas);
-                Point2D.Double snapPoint = renderer.calculateSnapPoint(
-                        currAtom.getPosition(),
+
+                // 시작점에서의 방향 벡터 계산
+                Point2D.Double startPos = currAtom.getPosition();
+                Point2D.Double direction = renderer.calculateSnapPoint(
+                        startPos,
                         formulaMgr.getAtopTemp().getPosition()
                 );
-                formulaMgr.getAtopTemp().setPosition(snapPoint);
+
+                // 방향 벡터 정규화 및 고정 길이 적용
+                double dx = direction.x - startPos.x;
+                double dy = direction.y - startPos.y;
+                double length = Math.sqrt(dx * dx + dy * dy);
+                if (length > 0) {
+                    double scale = noteFormulaMgr.LENGTH_EDGE_DEFAULT / length;
+                    Point2D.Double snapPoint = new Point2D.Double(
+                            startPos.x + dx * scale,
+                            startPos.y + dy * scale
+                    );
+                    formulaMgr.getAtopTemp().setPosition(snapPoint);
+                }
             }
 
             // 캔버스 다시 그리기
