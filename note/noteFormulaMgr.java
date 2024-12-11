@@ -5,10 +5,22 @@ import java.util.ArrayList;
 public class noteFormulaMgr {
 
     // constants
-    public static final double LENGTH_EDGE_DEFAULT = 100.0; // 기본 엣지 길이
+    public static final double ANGLE_SNAP = 120.0; // 스냅 각도 (120도)
 
     // fields
     private noteFormula mCurrFormula = null;
+
+    // 현재 작업 중인 엣지와 아톰들을 추적하기 위한 리스트
+    private ArrayList<noteFormulaEdge> mPrevEdges = null;
+    private ArrayList<noteFormulaAtom> mPrevAtoms = null;
+
+    public ArrayList<noteFormulaEdge> getPrevEdges() {
+        return this.mPrevEdges;
+    }
+
+    public ArrayList<noteFormulaAtom> getPrevAtoms() {
+        return this.mPrevAtoms;
+    }
 
     public noteFormula getCurrFormula() {
         return this.mCurrFormula;
@@ -64,6 +76,23 @@ public class noteFormulaMgr {
     // constructor
     public noteFormulaMgr() {
         this.mFormulas = new ArrayList<>();
+        this.mPrevEdges = new ArrayList<>();
+        this.mPrevAtoms = new ArrayList<>();
+    }
+
+    // 현재 작업 중인 엣지/아톰 추가
+    public void addPrevEdge(noteFormulaEdge edge) {
+        this.mPrevEdges.add(edge);
+    }
+
+    public void addPrevAtom(noteFormulaAtom atom) {
+        this.mPrevAtoms.add(atom);
+    }
+
+    // 현재 작업 리스트 초기화
+    public void clearPrevElements() {
+        this.mPrevEdges.clear();
+        this.mPrevAtoms.clear();
     }
 
     // 메서드 

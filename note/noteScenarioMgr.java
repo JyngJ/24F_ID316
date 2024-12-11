@@ -5,6 +5,7 @@ import note.scenario.noteFormulaScenario;
 import x.XScenarioMgr;
 
 public class noteScenarioMgr extends XScenarioMgr {
+
     // constructor
     public noteScenarioMgr(noteApp note) {
         super(note);
@@ -25,5 +26,5 @@ public class noteScenarioMgr extends XScenarioMgr {
     protected void setInitCurrScene() {
         this.setCurrScene(noteDefaultScenario.ReadyScene.getSingleton());
     }
-    
+
 }

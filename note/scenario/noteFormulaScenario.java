@@ -192,7 +192,17 @@ public class noteFormulaScenario extends XScenario {
 
         @Override
         public void handleMousePress(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            noteFormulaMgr formulaMgr = note.getFormulaMgr();
 
+            // 새로운 작업 시작시 현재 작업 리스트 초기화
+            formulaMgr.clearPrevElements();
+
+            // 시작 아톰 추가
+            noteFormulaAtom startAtom = formulaMgr.getCurrAtom();
+            if (startAtom != null) {
+                formulaMgr.addPrevAtom(startAtom);
+            }
         }
 
         @Override
@@ -203,11 +213,46 @@ public class noteFormulaScenario extends XScenario {
 
             // 현재 마우스 위치
             Point2D.Double currentPoint = new Point2D.Double(e.getX(), e.getY());
-
-            // 시작 Atom 가져오기
             noteFormulaAtom currAtom = formulaMgr.getCurrAtom();
 
-            // 다른 Atom 위에 있는지 확인
+            // EdgeTemp 터치 확인 및 거리 체크
+            noteFormulaEdgeTemp edgeTemp = formulaMgr.getEdgeTemp();
+            if (edgeTemp != null && edgeTemp.containsPoint(currentPoint)) {
+                // 현재 마우스 위치와 currAtom과의 거리 계산
+                Point2D.Double startPos = currAtom.getPosition();
+                double dx = currentPoint.x - startPos.x;
+                double dy = currentPoint.y - startPos.y;
+                double distance = Math.sqrt(dx * dx + dy * dy);
+
+                // 거리가 충분할 경우 새 Atom과 Edge 생성
+                if (distance >= noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 4) {
+                    // AtomTemp 위치에 새 Atom 생성
+                    Point2D.Double tempPos = formulaMgr.getAtopTemp().getPosition();
+                    noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, tempPos);
+
+                    // 현재 Formula 가져오기
+                    noteFormula currFormula = formulaMgr.getCurrFormula();
+
+                    // 새 Edge 생성 및 Formula에 추가
+                    noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, newAtom);
+                    currFormula.addEdge(newEdge);
+
+                    // 이전 작업 리스트에 추가
+                    formulaMgr.addPrevEdge(newEdge);
+                    formulaMgr.addPrevAtom(newAtom);
+
+                    // currAtom을 새로 만든 Atom으로 변경
+                    formulaMgr.setCurrAtom(newAtom);
+
+                    // EdgeTemp 업데이트
+                    noteFormulaAtomTemp tempAtom = formulaMgr.getAtopTemp();
+                    formulaMgr.setEdgeTemp(new noteFormulaEdgeTemp(newAtom, tempAtom));
+
+                    canvas.repaint();
+                }
+            }
+
+            // 기존 코드 계속 실행
             boolean isOverAtom = false;
             for (noteFormula formula : formulaMgr.getFormulas()) {
                 for (noteFormulaAtom atom : formula.getAtoms()) {
@@ -224,23 +269,19 @@ public class noteFormulaScenario extends XScenario {
             }
 
             if (!isOverAtom) {
-                // Atom 위에 없으면 기존처럼 스냅하되, 길이는 고정
                 formulaMgr.getAtopTemp().setPosition(currentPoint);
-                noteFormulaRenderer renderer = new noteFormulaRenderer(canvas);
-
-                // 시작점에서의 방향 벡터 계산
+                noteFormulaRenderer renderer = canvas.getRenderer();
                 Point2D.Double startPos = currAtom.getPosition();
                 Point2D.Double direction = renderer.calculateSnapPoint(
                         startPos,
                         formulaMgr.getAtopTemp().getPosition()
                 );
 
-                // 방향 벡터 정규화 및 고정 길이 적용
                 double dx = direction.x - startPos.x;
                 double dy = direction.y - startPos.y;
                 double length = Math.sqrt(dx * dx + dy * dy);
                 if (length > 0) {
-                    double scale = noteFormulaMgr.LENGTH_EDGE_DEFAULT / length;
+                    double scale = noteFormulaRenderer.LENGTH_EDGE_DEFAULT / length;
                     Point2D.Double snapPoint = new Point2D.Double(
                             startPos.x + dx * scale,
                             startPos.y + dy * scale
@@ -249,7 +290,6 @@ public class noteFormulaScenario extends XScenario {
                 }
             }
 
-            // 캔버스 다시 그리기
             canvas.repaint();
         }
 
@@ -268,19 +308,21 @@ public class noteFormulaScenario extends XScenario {
             formulaMgr.setAtomTemp(null);
             formulaMgr.setEdgeTemp(null);
 
-            // 다른 Atom 위에서 릴리즈된 경우 체크
+            // 다른 Atom 위에서 릴리즈된 경우
             for (noteFormula formula : formulaMgr.getFormulas()) {
                 for (noteFormulaAtom atom : formula.getAtoms()) {
                     if (atom.getTouchArea().contains(releasePoint)) {
                         // 두 Atom을 Edge로 연결
                         noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, atom);
                         currFormula.addEdge(newEdge);
+                        formulaMgr.addPrevEdge(newEdge);  // 현재 엣지 리스트에 추가
 
                         // 두 Formula를 병합
                         noteCmdToMergeFormula.execute(note, currFormula, formula);
 
                         formulaMgr.setCurrFormula(null);
                         formulaMgr.setCurrAtom(null);
+                        formulaMgr.clearPrevElements();  // 현재 작업 리스트 초기화
 
                         XCmdToChangeScene.execute(note,
                                 noteFormulaScenario.FormulaReadyScene.getSingleton(),
@@ -290,16 +332,18 @@ public class noteFormulaScenario extends XScenario {
                 }
             }
 
-            // 릴 공간에서 릴리즈된 경우, tempAtom의 위치(스냅된 위치)에 새 Atom 생성
+            // 빈 공간에서 릴리즈된 경우
             Point2D.Double snapPosition = tempAtom.getPosition();
             noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, snapPosition);
 
             // 현재 Atom과 새 Atom을 Edge로 연결
             noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, newAtom);
             currFormula.addEdge(newEdge);
+            formulaMgr.addPrevEdge(newEdge);  // 현재 엣지 리스트에 추가
 
             formulaMgr.setCurrFormula(null);
             formulaMgr.setCurrAtom(null);
+            formulaMgr.clearPrevElements();  // 현재 작업 리스트 초기화
 
             XCmdToChangeScene.execute(note,
                     noteFormulaScenario.FormulaReadyScene.getSingleton(),
