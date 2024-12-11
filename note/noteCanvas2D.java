@@ -7,6 +7,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import javax.swing.JPanel;
 
 public class noteCanvas2D extends JPanel {
@@ -71,6 +75,15 @@ public class noteCanvas2D extends JPanel {
 
         this.drawInfo(g2);
         this.drawFormulas(g2);
+        this.drawPtCurves(g2);
+        this.drawCurrPtCurve(g2);
+        
+        // draw pen tip
+        mNote.getColorChooser().drawCells(g2,this.getWidth(),this.getHeight());
+        Ellipse2D.Double e = 
+                new Ellipse2D.Double(750, 30 - 2.5f, 5f, 5f);
+        g2.setColor(this.mCurrColorForCurve);
+        g2.fill(e);
 
         noteScene currScene = (noteScene) mNote.getScenarioMgr().getCurrScene();
         currScene.renderWorldObjects(g2);
@@ -151,4 +164,48 @@ public class noteCanvas2D extends JPanel {
 //            (int) end.y
 //        );
 //    }
+
+
+
+
+    private void drawPtCurves(Graphics2D g2) {
+        for (notePtCurve ptCurve: this.mNote.getPtCurveMgr().getPtCurves()){
+            this.drawPtCurve(g2,
+                    ptCurve,
+                    ptCurve.getColor(),
+                    ptCurve.getStroke());
+        }
+    }
+
+    // Draw the in-progress curve
+    private void drawCurrPtCurve(Graphics2D g2) {
+        notePtCurve ptCurve = this.mNote.getPtCurveMgr().getCurrPtCurve();
+        if (ptCurve != null){
+        this.drawPtCurve(g2,
+                ptCurve,
+                ptCurve.mColor,
+                STROKE_PT_CURVE_DEFAULT);
+        }
+    }
+
+    private void drawPtCurve(Graphics2D g2, 
+            notePtCurve ptCurve, Color c, Stroke s) {
+        Path2D.Double path = new Path2D.Double();
+        ArrayList<Point2D.Double> pts = ptCurve.getPts();
+        if (pts.size() < 2){
+            // Don't draw if it's just a point
+            return;
+        }
+        Point2D.Double pt0 = pts.get(0);
+        path.moveTo(pt0.x, pt0.y);
+        for (int i = 1 ; i < pts.size() ; i++) {
+            Point2D.Double pt = pts.get(i);
+            path.lineTo(pt.x, pt.y);
+        }
+        g2.setColor(c);
+        g2.setStroke(s);
+        g2.draw(path);
+    }
+
 }
+

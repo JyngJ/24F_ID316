@@ -14,6 +14,10 @@ public class noteApp extends XApp {
     }
     
     private XScenarioMgr mScenarioMgr = null;
+    public noteColorChooser mColorChooser = null;
+    public noteColorChooser getColorChooser() {
+        return this.mColorChooser;
+    }
     
     @Override
     public XScenarioMgr getScenarioMgr() {
@@ -34,6 +38,16 @@ public class noteApp extends XApp {
         return this.mFormulaMgr;
     }
     
+    private notePtCurveMgr mPtCurveMgr = null;
+    public notePtCurveMgr getPtCurveMgr() {
+        return this.mPtCurveMgr;
+    }
+    
+    public noteXform mXform = null;
+    public noteXform getXform() {
+        return this.mXform;
+    }
+    
     public noteApp() {
         //create components
         // 1) frame 2) canvas
@@ -44,6 +58,9 @@ public class noteApp extends XApp {
         this.mLogMgr = new XLogMgr();
         this.mLogMgr.setPrintOn(true);
         this.mFormulaMgr = new noteFormulaMgr();
+        this.mPtCurveMgr = new notePtCurveMgr();
+        this.mXform = new noteXform();
+        this.mColorChooser = new noteColorChooser();
         
         //connect event listeners
         this.mCanvas2D.addMouseListener(this.mEventListener);

@@ -1,8 +1,13 @@
 package note.scenario;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import note.cmd.noteCmdToCreatePtCurve;
 import note.noteApp;
 import x.*;
 import note.noteScene;
@@ -30,6 +35,9 @@ public class noteDefaultScenario extends XScenario {
     }
     
     public static class ReadyScene extends noteScene {
+
+        public ArrayList<Point2D> points;
+
         // singleton pattern
         private static ReadyScene mSingleton = null;
         public static ReadyScene getSingleton() {
@@ -43,18 +51,37 @@ public class noteDefaultScenario extends XScenario {
         }
         private ReadyScene(XScenario scenario) {
             super(scenario);
+            points = new ArrayList<>();
         }
 
-        @Override
         public void handleMousePress(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            Point pt = e.getPoint();
+            // Is on ColorChooser?
+            if (pt.x >= 650 && pt.x < 730 && pt.y > 20) {
+            } else {
+            noteCmdToCreatePtCurve.execute(note, pt);
+            XCmdToChangeScene.execute(note, 
+                        noteDrawScenario.DrawScene.getSingleton(), this);
+            }
         }
 
         @Override
         public void handleMouseDrag(MouseEvent e) {
-        }
+
+            }
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            Point pt = e.getPoint();
+            Color c = note.getColorChooser().calcColor(pt,
+                        note.getCanvas2D().getWidth(),
+                        note.getCanvas2D().getHeight());
+            if (c != null) { // On ColorChooser
+                note.getCanvas2D().setCurrColorForPtCurve(c);
+            }
+            note.getPtCurveMgr().setCurrPtCurve(null);
         }
 
         @Override
@@ -66,19 +93,15 @@ public class noteDefaultScenario extends XScenario {
                     XCmdToChangeScene.execute(note, 
                         noteFormulaScenario.FormulaReadyScene.getSingleton(), this);
                     break;
+                case KeyEvent.VK_E:
+                    XCmdToChangeScene.execute(note, 
+                        noteDrawScenario.EraseScene.getSingleton(), this);
+                    break;
             }
         }
 
         @Override
         public void handleKeyUp(KeyEvent e) {
-            noteApp note = (noteApp) this.mScenario.getApp();
-            int code = e.getKeyCode();
-            switch (code) {
-//                case KeyEvent.VK_F:             // will be changed
-//                    XCmdToChangeScene.execute(note, 
-//                        noteFormulaScenario.FormulaReadyScene.getSingleton(), this);
-//                    break;
-            }
         }
 
         @Override
