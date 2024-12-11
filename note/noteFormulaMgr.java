@@ -3,55 +3,69 @@ package note;
 import java.util.ArrayList;
 
 public class noteFormulaMgr {
+
+    // constants
+    public static final double LENGTH_EDGE_DEFAULT = 100.0; // 기본 엣지 길이
+
     // fields
     private noteFormula mCurrFormula = null;
+
     public noteFormula getCurrFormula() {
         return this.mCurrFormula;
     }
-    public void setCurrFormula (noteFormula formula) {
+
+    public void setCurrFormula(noteFormula formula) {
         this.mCurrFormula = formula;
     }
-    
+
     private noteFormulaAtomTemp mTempAtom = null;
+
     public noteFormulaAtomTemp getAtopTemp() {
         return this.mTempAtom;
     }
+
     public void setAtomTemp(noteFormulaAtomTemp tempAtom) {
         this.mTempAtom = tempAtom;
     }
-    
+
     private noteFormulaEdgeTemp mTempEdge = null;
+
     public noteFormulaEdgeTemp getEdgeTemp() {
         return this.mTempEdge;
     }
+
     public void setEdgeTemp(noteFormulaEdgeTemp tempEdge) {
         this.mTempEdge = tempEdge;
     }
-    
+
     // 현재 엣지가 시작되고 있는 atom
     private noteFormulaAtom mCurrAtom = null;
+
     public noteFormulaAtom getCurrAtom() {
         return this.mCurrAtom;
     }
-    public void setCurrAtom (noteFormulaAtom atom) {
+
+    public void setCurrAtom(noteFormulaAtom atom) {
         this.mCurrAtom = atom;
     }
-    
-    private ArrayList <noteFormula> mFormulas = null;
-    public ArrayList <noteFormula> getFormulas() {
+
+    private ArrayList<noteFormula> mFormulas = null;
+
+    public ArrayList<noteFormula> getFormulas() {
         return this.mFormulas;
     }
-    
+
     private noteFormula mSelectedFormula = null;
-    public noteFormula getSelectedFormula(){
+
+    public noteFormula getSelectedFormula() {
         return this.mSelectedFormula;
     }
-    
+
     // constructor
     public noteFormulaMgr() {
         this.mFormulas = new ArrayList<>();
     }
-    
+
     // 메서드 
     // 특정 Atom이 속한 Formula를 찾는 메서드
     public noteFormula findFormulaForAtom(noteFormulaAtom atom) {

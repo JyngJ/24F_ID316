@@ -22,17 +22,21 @@ import x.XCmdToChangeScene;
 import x.XScenario;
 
 public class noteFormulaScenario extends XScenario {
+
     // singleton
     private static noteFormulaScenario mSingleton = null;
+
     public static noteFormulaScenario getSingleton() {
-        assert(noteFormulaScenario.mSingleton != null);
+        assert (noteFormulaScenario.mSingleton != null);
         return noteFormulaScenario.mSingleton;
     }
+
     public static noteFormulaScenario createSingleton(XApp app) {
-        assert(noteFormulaScenario.mSingleton == null);
+        assert (noteFormulaScenario.mSingleton == null);
         noteFormulaScenario.mSingleton = new noteFormulaScenario(app);
         return noteFormulaScenario.mSingleton;
     }
+
     private noteFormulaScenario(XApp app) {
         super(app);
     }
@@ -44,21 +48,25 @@ public class noteFormulaScenario extends XScenario {
     }
 
     public static class FormulaReadyScene extends noteScene {
+
         // singleton pattern
         private static FormulaReadyScene mSingleton = null;
+
         public static FormulaReadyScene getSingleton() {
-            assert(FormulaReadyScene.mSingleton != null);
+            assert (FormulaReadyScene.mSingleton != null);
             return FormulaReadyScene.mSingleton;
         }
+
         public static FormulaReadyScene createSingleton(XScenario scenario) {
-            assert(FormulaReadyScene.mSingleton == null);
+            assert (FormulaReadyScene.mSingleton == null);
             FormulaReadyScene.mSingleton = new FormulaReadyScene(scenario);
             return FormulaReadyScene.mSingleton;
         }
+
         private FormulaReadyScene(XScenario scenario) {
             super(scenario);
         }
-        
+
         @Override
         public void handleMousePress(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
@@ -66,9 +74,8 @@ public class noteFormulaScenario extends XScenario {
 
             // 클릭 위치 가져오기
             Point pt = e.getPoint(); // MouseEvent에서 가져온 Point
-            Point2D.Double point2D 
-                = new Point2D.Double(pt.x, pt.y);    //실수형으로 변환 
-
+            Point2D.Double point2D
+                    = new Point2D.Double(pt.x, pt.y);    //실수형으로 변환 
 
             // Formula 리스트에서 클릭 위치가 Atom의 터치 영역에 있는지 확인
             for (noteFormula formula : formulaMgr.getFormulas()) {
@@ -77,29 +84,28 @@ public class noteFormulaScenario extends XScenario {
                         // 클릭 위치가 Atom의 터치 영역 안에 있음
                         formulaMgr.setCurrAtom(atom);
                         formulaMgr.setCurrFormula(formula);
-                        
+
                         noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("temp", point2D);
                         formulaMgr.setAtomTemp(tempAtom);
                         noteFormulaEdgeTemp tempEdge = new noteFormulaEdgeTemp(atom, tempAtom);
                         formulaMgr.setEdgeTemp(tempEdge);
 
                         // 씬 전환
-                        XCmdToChangeScene.execute
-                            (note, 
-                            noteFormulaScenario.FormulaDrawScene.getSingleton(), 
-                            this.mReturnScene);
+                        XCmdToChangeScene.execute(note,
+                                noteFormulaScenario.FormulaDrawScene.getSingleton(),
+                                this.mReturnScene);
                         return;
                     }
                 }
             }
 
-            noteFormulaAtom newAtom 
-                = noteCmdToCreateAtom.execute(note, point2D);
+            noteFormulaAtom newAtom
+                    = noteCmdToCreateAtom.execute(note, point2D);
 
             formulaMgr.setCurrAtom(newAtom);
             formulaMgr.setCurrFormula(
-                formulaMgr.findFormulaForAtom(newAtom));
-            
+                    formulaMgr.findFormulaForAtom(newAtom));
+
             noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("temp", point2D);
             formulaMgr.setAtomTemp(tempAtom);
             noteFormulaEdgeTemp tempEdge = new noteFormulaEdgeTemp(newAtom, tempAtom);
@@ -107,23 +113,23 @@ public class noteFormulaScenario extends XScenario {
 
             // 씬 전환
             XCmdToChangeScene.execute(note,
-                noteFormulaScenario.FormulaDrawScene.getSingleton(), 
-                this.mReturnScene);
+                    noteFormulaScenario.FormulaDrawScene.getSingleton(),
+                    this.mReturnScene);
         }
 
-        @Override 
+        @Override
         public void handleMouseDrag(MouseEvent e) {
-        
+
         }
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
-        
+
         }
 
         @Override
         public void handleKeyDown(KeyEvent e) {
-            
+
         }
 
         @Override
@@ -132,54 +138,58 @@ public class noteFormulaScenario extends XScenario {
             int code = e.getKeyCode();
             switch (code) {
                 case KeyEvent.VK_F:             // will be changed
-                    XCmdToChangeScene.execute(note, 
-                        mReturnScene, null);
+                    XCmdToChangeScene.execute(note,
+                            mReturnScene, null);
                     break;
             }
         }
 
         @Override
         public void updateSupportObjects() {
-        
+
         }
 
         @Override
         public void renderWorldObjects(Graphics2D g2) {
-        
+
         }
 
         @Override
         public void renderScreenObjects(Graphics2D g2) {
-        
+
         }
 
         @Override
         public void getReady() {
-        
+
         }
 
         @Override
         public void wrapUp() {
-        
+
         }
     }
-    
+
     public static class FormulaDrawScene extends noteScene {
+
         // singleton pattern
         private static FormulaDrawScene mSingleton = null;
+
         public static FormulaDrawScene getSingleton() {
-            assert(FormulaDrawScene.mSingleton != null);
+            assert (FormulaDrawScene.mSingleton != null);
             return FormulaDrawScene.mSingleton;
         }
+
         public static FormulaDrawScene createSingleton(XScenario scenario) {
-            assert(FormulaDrawScene.mSingleton == null);
+            assert (FormulaDrawScene.mSingleton == null);
             FormulaDrawScene.mSingleton = new FormulaDrawScene(scenario);
             return FormulaDrawScene.mSingleton;
         }
+
         private FormulaDrawScene(XScenario scenario) {
             super(scenario);
         }
-        
+
         @Override
         public void handleMousePress(MouseEvent e) {
 
@@ -196,37 +206,69 @@ public class noteFormulaScenario extends XScenario {
 
             // 시작 Atom 가져오기
             noteFormulaAtom currAtom = formulaMgr.getCurrAtom();
-            
-            formulaMgr.getAtopTemp().setPosition(currentPoint);
 
-            // 스냅 지점 계산
-            noteFormulaRenderer renderer = new noteFormulaRenderer(canvas);
-//            System.out.print(formulaMgr.getAtopTemp().getPosition());
-            Point2D.Double snapPoint = renderer.calculateSnapPoint(currAtom.getPosition(), formulaMgr.getAtopTemp().getPosition());
-            
-            // tempAtom을 스냅된 위치로 이동
-            formulaMgr.getAtopTemp().setPosition(snapPoint);
+            // 다른 Atom 위에 있는지 확인
+            boolean isOverAtom = false;
+            for (noteFormula formula : formulaMgr.getFormulas()) {
+                for (noteFormulaAtom atom : formula.getAtoms()) {
+                    if (atom != currAtom && atom.getTouchArea().contains(currentPoint)) {
+                        // 다른 Atom 위에 있으면 해당 Atom으로 직접 연결
+                        formulaMgr.getAtopTemp().setPosition(atom.getPosition());
+                        isOverAtom = true;
+                        break;
+                    }
+                }
+                if (isOverAtom) {
+                    break;
+                }
+            }
+
+            if (!isOverAtom) {
+                // Atom 위에 없으면 기존처럼 스냅하되, 길이는 고정
+                formulaMgr.getAtopTemp().setPosition(currentPoint);
+                noteFormulaRenderer renderer = new noteFormulaRenderer(canvas);
+
+                // 시작점에서의 방향 벡터 계산
+                Point2D.Double startPos = currAtom.getPosition();
+                Point2D.Double direction = renderer.calculateSnapPoint(
+                        startPos,
+                        formulaMgr.getAtopTemp().getPosition()
+                );
+
+                // 방향 벡터 정규화 및 고정 길이 적용
+                double dx = direction.x - startPos.x;
+                double dy = direction.y - startPos.y;
+                double length = Math.sqrt(dx * dx + dy * dy);
+                if (length > 0) {
+                    double scale = noteFormulaMgr.LENGTH_EDGE_DEFAULT / length;
+                    Point2D.Double snapPoint = new Point2D.Double(
+                            startPos.x + dx * scale,
+                            startPos.y + dy * scale
+                    );
+                    formulaMgr.getAtopTemp().setPosition(snapPoint);
+                }
+            }
 
             // 캔버스 다시 그리기
             canvas.repaint();
         }
 
-
         @Override
         public void handleMouseRelease(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
             noteFormulaMgr formulaMgr = note.getFormulaMgr();
+            noteCanvas2D canvas = note.getCanvas2D();
 
-            int mouseX = e.getX();
-            int mouseY = e.getY();
-            Point2D.Double releasePoint = new Point2D.Double(mouseX, mouseY);
-
+            Point2D.Double releasePoint = new Point2D.Double(e.getX(), e.getY());
             noteFormulaAtom currAtom = formulaMgr.getCurrAtom();
             noteFormula currFormula = formulaMgr.getCurrFormula();
-            
+
+            // 임시 객체들 정리
+            noteFormulaAtomTemp tempAtom = formulaMgr.getAtopTemp();
             formulaMgr.setAtomTemp(null);
             formulaMgr.setEdgeTemp(null);
-            
+
+            // 다른 Atom 위에서 릴리즈된 경우 체크
             for (noteFormula formula : formulaMgr.getFormulas()) {
                 for (noteFormulaAtom atom : formula.getAtoms()) {
                     if (atom.getTouchArea().contains(releasePoint)) {
@@ -241,14 +283,16 @@ public class noteFormulaScenario extends XScenario {
                         formulaMgr.setCurrAtom(null);
 
                         XCmdToChangeScene.execute(note,
-                            noteFormulaScenario.FormulaReadyScene.getSingleton(), this.mReturnScene);
+                                noteFormulaScenario.FormulaReadyScene.getSingleton(),
+                                this.mReturnScene);
                         return;
                     }
                 }
             }
 
-            // 릴리즈 위치가 기존 Atom의 터치 영역에 없으면 명령어를 사용해 새 Atom 생성
-            noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, releasePoint);
+            // 릴 공간에서 릴리즈된 경우, tempAtom의 위치(스냅된 위치)에 새 Atom 생성
+            Point2D.Double snapPosition = tempAtom.getPosition();
+            noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, snapPosition);
 
             // 현재 Atom과 새 Atom을 Edge로 연결
             noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, newAtom);
@@ -258,14 +302,13 @@ public class noteFormulaScenario extends XScenario {
             formulaMgr.setCurrAtom(null);
 
             XCmdToChangeScene.execute(note,
-                noteFormulaScenario.FormulaReadyScene.getSingleton(), this.mReturnScene);
+                    noteFormulaScenario.FormulaReadyScene.getSingleton(),
+                    this.mReturnScene);
         }
-
-
 
         @Override
         public void handleKeyDown(KeyEvent e) {
-            
+
         }
 
         @Override
@@ -277,36 +320,36 @@ public class noteFormulaScenario extends XScenario {
                 case KeyEvent.VK_F:             // will be changed
                     formulaMgr.setAtomTemp(null);
                     formulaMgr.setEdgeTemp(null);
-                    XCmdToChangeScene.execute(note, 
-                        mReturnScene, null);
+                    XCmdToChangeScene.execute(note,
+                            mReturnScene, null);
                     break;
             }
         }
 
         @Override
         public void updateSupportObjects() {
-        
+
         }
 
         @Override
         public void renderWorldObjects(Graphics2D g2) {
-        
+
         }
 
         @Override
         public void renderScreenObjects(Graphics2D g2) {
-        
+
         }
 
         @Override
         public void getReady() {
-        
+
         }
 
         @Override
         public void wrapUp() {
-        
+
         }
     }
-    
+
 }
