@@ -193,4 +193,10 @@ public class noteFormulaMgr {
         }
     }
 
+    public void translateSelectedFormula(double dx, double dy) {
+        if (this.mSelectedFormula != null) {
+            this.mSelectedFormula.translateTo(dx, dy);
+        }
+    }
+
 }
