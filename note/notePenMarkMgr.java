@@ -46,11 +46,9 @@ public class notePenMarkMgr {
     // 현재 드래그 중인지 판단
     public boolean isDragging() {
         if (mCurrMark == null) {
-            System.out.println("mCurrMark is null");
             return false;
         }
         double dist = mCurrMark.getTotalDistance();
-        // System.out.println("Total distance: " + dist);
         return dist > 3.0;  // 3.0 이상 움직였으면 드래그로 판단
     }
 

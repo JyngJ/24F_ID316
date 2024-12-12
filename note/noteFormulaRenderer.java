@@ -233,14 +233,22 @@ public class noteFormulaRenderer {
             double lastAngle = Math.atan2(lastDy, lastDx);
 
             // 마지막 엣지 방향에서 ±120도 방향만 허용
-            double angle1 = lastAngle + (Math.PI / 3);  // +120도
-            double angle2 = lastAngle - (Math.PI / 3);  // -120도
+            double angle1 = lastAngle + (Math.PI / 3);
+            angle1 = (angle1 % (2 * Math.PI) + (2 * Math.PI)) % (2 * Math.PI);
+            double angle2 = lastAngle - (Math.PI / 3);
+            angle2 = (angle2 % (2 * Math.PI) + (2 * Math.PI)) % (2 * Math.PI);
 
-            // 현재 각도와 가까운 쪽 선택
-            double diff1 = Math.abs(angle - angle1);
-            double diff2 = Math.abs(angle - angle2);
+            // 각도 차이를 0 ~ π로 정규화
+            double diff1 = Math.min(Math.abs(angle - angle1), 2 * Math.PI - Math.abs(angle - angle1));
+            double diff2 = Math.min(Math.abs(angle - angle2), 2 * Math.PI - Math.abs(angle - angle2));
 
+            // 가까운 각도를 선택
             angle = (diff1 < diff2) ? angle1 : angle2;
+            // // 현재 각도와 가까운 쪽 선택
+            // double diff1 = Math.abs(angle - angle1);
+            // double diff2 = Math.abs(angle - angle2);
+
+            // angle = (diff1 < diff2) ? angle1 : angle2;
         } else {
             // 엣지가 없는 경우 60도 간격 스냅
             double[] allowedAngles = {

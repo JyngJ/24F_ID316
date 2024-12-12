@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import note.cmd.noteCmdToCreateAtom;
+import note.cmd.noteCmdToMergeFormula;
 import note.noteApp;
 import note.noteCanvas2D;
 import note.noteFormula;
@@ -328,7 +329,6 @@ public class noteFormulaDrawScenario extends XScenario {
 
             Point2D.Double releasePoint = new Point2D.Double(e.getX(), e.getY());
             noteFormulaAtom currAtom = formulaMgr.getCurrAtom();
-            noteFormula currFormula = formulaMgr.getCurrFormula();
 
             // 임시 객체들 정리
             noteFormulaAtomTemp tempAtom = formulaMgr.getAtopTemp();
@@ -339,9 +339,18 @@ public class noteFormulaDrawScenario extends XScenario {
             for (noteFormula formula : formulaMgr.getFormulas()) {
                 for (noteFormulaAtom atom : formula.getAtoms()) {
                     if (atom.getTouchArea().contains(releasePoint)) {
-                        // 두 Atom을 Edge로 연결하고 prev 리스트에 추가
+                        // 두 Atom을 Edge로 연결하고 prev 리스트와 Formula에 추가
                         noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, atom);
                         formulaMgr.addPrevEdge(newEdge);
+
+                        // Formula에 Edge 추가
+                        noteFormula sourceFormula = formulaMgr.findFormulaForAtom(currAtom);
+                        sourceFormula.addEdge(newEdge);
+
+                        // Formula 병합
+                        noteFormula targetFormula = formula;
+                        noteCmdToMergeFormula.execute(note, sourceFormula, targetFormula);
+                        canvas.repaint();
 
                         // 씬 전환
                         XCmdToChangeScene.execute(note,

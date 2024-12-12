@@ -52,4 +52,8 @@ public class notePenMark {
     public ArrayList<Point2D.Double> getPoints() {
         return mPoints;
     }
+
+    public long getStartTime() {
+        return mStartTime;
+    }
 }

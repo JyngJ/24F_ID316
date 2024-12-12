@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import note.cmd.noteCmdToCreatePtCurve;
 import note.noteApp;
 import note.noteFormula;
-import note.noteFormulaMgr;
 import note.noteScene;
 import x.*;
 
@@ -62,18 +61,11 @@ public class noteDefaultScenario extends XScenario {
             points = new ArrayList<>();
         }
 
-        private long pressStartTime;  // 프레스 시작 시간
-        private Point2D.Double pressStartPoint;  // 프레스 시작 위치
-        private static final double MAX_MOVE_DISTANCE = 5.0; // 롱프레스 중 허용되는 최대 이동 거리
-
         @Override
         public void handleMousePress(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
             Point pt = e.getPoint();
-
-            // 롱프레스 시작 정보 저장
-            pressStartTime = System.currentTimeMillis();
-            pressStartPoint = new Point2D.Double(pt.x, pt.y);
+            Point2D.Double pt2D = new Point2D.Double(pt.x, pt.y);
 
             // ColorChooser 영역 체크
             if (pt.x >= 22 && pt.x < 105 && pt.y <= 60 && pt.y > 40) {
@@ -81,7 +73,7 @@ public class noteDefaultScenario extends XScenario {
                 // Formula 터치 체크
                 boolean touchedFormula = false;
                 for (noteFormula formula : note.getFormulaMgr().getFormulas()) {
-                    if (formula.isTouchedBy(pressStartPoint)) {
+                    if (formula.isTouchedBy(pt2D)) {
                         touchedFormula = true;
                         break;
                     }
@@ -98,29 +90,19 @@ public class noteDefaultScenario extends XScenario {
 
         @Override
         public void handleMouseDrag(MouseEvent e) {
-            Point2D.Double currentPoint = new Point2D.Double(e.getX(), e.getY());
             noteApp note = (noteApp) this.mScenario.getApp();
-
-            // 드래그 거리가 허용 범위를 넘어가면 롱프레스 취소
-            if (pressStartPoint != null
-                    && pressStartPoint.distance(currentPoint) > MAX_MOVE_DISTANCE) {
-                pressStartPoint = null;
-            }
+            Point2D.Double currentPoint = new Point2D.Double(e.getX(), e.getY());
 
             // 롱프레스 체크
-            if (pressStartPoint != null) {
-                long pressDuration = System.currentTimeMillis() - pressStartTime;
-                if (pressDuration >= noteFormulaMgr.LONG_PRESS_DURATION) {
-                    // Formula 터치 체크
-                    for (noteFormula formula : note.getFormulaMgr().getFormulas()) {
-                        if (formula.isTouchedBy(pressStartPoint)) {
-                            // Formula를 편집 모드로 설정하고 Edit 씬으로 전환
-                            note.getFormulaMgr().setEditingFormula(formula);
-                            XCmdToChangeScene.execute(note,
-                                    noteFormulaEditScenario.noteFormulaEditReadyScene.getSingleton(), this);
-                            pressStartPoint = null;  // 롱프레스 정보 초기화
-                            return;
-                        }
+            if (note.getPenMarkMgr().isLongPress()) {
+                // Formula 터치 체크
+                for (noteFormula formula : note.getFormulaMgr().getFormulas()) {
+                    if (formula.isTouchedBy(currentPoint)) {
+                        // Formula를 편집 모드로 설정하고 Edit 씬으로 전환
+                        note.getFormulaMgr().setEditingFormula(formula);
+                        XCmdToChangeScene.execute(note,
+                                noteFormulaEditScenario.noteFormulaEditReadyScene.getSingleton(), this);
+                        return;
                     }
                 }
             }
@@ -139,9 +121,6 @@ public class noteDefaultScenario extends XScenario {
                 note.getCanvas2D().setCurrColorForPtCurve(c);
             }
             note.getPtCurveMgr().setCurrPtCurve(null);
-
-            // 롱프레스 정보 초기화
-            pressStartPoint = null;
         }
 
         @Override

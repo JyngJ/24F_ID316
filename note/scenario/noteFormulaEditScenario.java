@@ -169,7 +169,6 @@ public class noteFormulaEditScenario extends XScenario {
 
             // formula 이동
             noteFormula editingFormula = note.getFormulaMgr().getEditingFormula();
-            System.out.println("isDragging: " + note.getPenMarkMgr().isDragging());
             if (editingFormula != null && note.getPenMarkMgr().isDragging()) {
                 Point2D.Double relativeDistance = note.getPenMarkMgr().getRelativeDistance();
                 if (relativeDistance != null) {
