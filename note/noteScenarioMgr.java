@@ -2,9 +2,8 @@ package note;
 
 import note.scenario.noteDefaultScenario;
 import note.scenario.noteDrawScenario;
-import note.scenario.noteFormulaScenario;
-import note.scenario.noteSelectScenario;
 import note.scenario.noteFormulaDrawScenario;
+import note.scenario.noteSelectScenario;
 import x.XScenarioMgr;
 
 public class noteScenarioMgr extends XScenarioMgr {

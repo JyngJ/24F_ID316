@@ -3,6 +3,7 @@ package note;
 import java.util.ArrayList;
 
 public class notePtCurveMgr {
+
     // fields
     private notePtCurve mCurrPtCurve = null;
 
@@ -40,11 +41,10 @@ public class notePtCurveMgr {
 
     // Set selection state for multiple curves
     public void setSelectedState(ArrayList<notePtCurve> curves,
-        notePtCurve.SelectState state) {
+            notePtCurve.SelectState state) {
         for (notePtCurve curve : curves) {
             curve.setSelectState(state);
         }
-    }
     }
 
     public void translateSelectedCurves(double dx, double dy) {
