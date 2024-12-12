@@ -4,6 +4,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
 public class noteFormulaAtom {
+
     // Atom 종류 (C, O, N 등)
     private String atomType;
 
@@ -21,10 +22,10 @@ public class noteFormulaAtom {
 
         // 터치 영역을 원형으로 정의
         this.touchArea = new Ellipse2D.Double(
-            position.x - tr,
-            position.y - tr,
-            tr * 2,
-            tr * 2
+                position.x - tr,
+                position.y - tr,
+                tr * 2,
+                tr * 2
         );
     }
 
@@ -54,11 +55,28 @@ public class noteFormulaAtom {
     private void updateTouchArea() {
         float tr = noteCanvas2D.ATOM_TOUCH_AREA_RADIUS;
         this.touchArea.setFrame(
-            position.x - tr,
-            position.y - tr,
-            tr * 2,
-            tr * 2
+                position.x - tr,
+                position.y - tr,
+                tr * 2,
+                tr * 2
         );
+    }
+
+    public boolean isTouchedBy(Point2D.Double pt) {
+        return this.touchArea.contains(pt);
+    }
+
+    public void translateTouchAreaTo(double dx, double dy) {
+        if (this.touchArea != null) {
+            // 현재 터치 영역의 위치와 크기 가져오기
+            double x = touchArea.getX();
+            double y = touchArea.getY();
+            double width = touchArea.getWidth();
+            double height = touchArea.getHeight();
+
+            // 새로운 위치로 이동
+            touchArea.setFrame(x + dx, y + dy, width, height);
+        }
     }
 
 }

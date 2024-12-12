@@ -19,37 +19,37 @@ public class noteFormulaRenderer {
         this.mNote = note;
         this.mCanvas2D = canvas;
     }
-    
-    // Drawing을 렌더링
-public void renderDrawing(noteApp note, Graphics2D g2) {
-    this.mNote = note;
-    notePtCurve currPtCurve = note.getPtCurveMgr().getCurrPtCurve();
 
-    if (currPtCurve != null) {
-        renderPtCurve(g2, currPtCurve);
+    // Drawing을 렌더링
+    public void renderDrawing(noteApp note, Graphics2D g2) {
+        this.mNote = note;
+        notePtCurve currPtCurve = note.getPtCurveMgr().getCurrPtCurve();
+
+        if (currPtCurve != null) {
+            renderPtCurve(g2, currPtCurve);
+        }
     }
-}
 
 // 단일 ptCurve를 렌더링
-public void renderPtCurve(Graphics2D g2, notePtCurve ptCurve) {
-    // ptCurve의 점 목록을 가져와 Path2D로 그리기
-    java.util.List<Point2D.Double> points = ptCurve.getPts();
-    if (points.size() > 1) {
-        Path2D path = new Path2D.Double();
-        Point2D.Double firstPoint = points.get(0);
-        path.moveTo(firstPoint.x, firstPoint.y);
-        
-        for (int i = 1; i < points.size(); i++) {
-            Point2D.Double point = points.get(i);
-            path.lineTo(point.x, point.y);
-        }
+    public void renderPtCurve(Graphics2D g2, notePtCurve ptCurve) {
+        // ptCurve의 점 목록을 가져와 Path2D로 그리기
+        java.util.List<Point2D.Double> points = ptCurve.getPts();
+        if (points.size() > 1) {
+            Path2D path = new Path2D.Double();
+            Point2D.Double firstPoint = points.get(0);
+            path.moveTo(firstPoint.x, firstPoint.y);
 
-        // Stroke 및 Color 설정
-        g2.setColor(ptCurve.getColor());
-        g2.setStroke(ptCurve.getStroke());
-        g2.draw(path);
+            for (int i = 1; i < points.size(); i++) {
+                Point2D.Double point = points.get(i);
+                path.lineTo(point.x, point.y);
+            }
+
+            // Stroke 및 Color 설정
+            g2.setColor(ptCurve.getColor());
+            g2.setStroke(ptCurve.getStroke());
+            g2.draw(path);
+        }
     }
-}
 
     // 모든 Formulas를 렌더링
     public void renderFormulas(noteApp note, Graphics2D g2) {
@@ -75,14 +75,28 @@ public void renderPtCurve(Graphics2D g2, notePtCurve ptCurve) {
 
     // Formula를 그리는 메서드
     public void renderFormula(Graphics2D g2, noteFormula formula) {
-        // Atom 그리기
-        for (noteFormulaAtom atom : formula.getAtoms()) {
-            renderAtom(g2, atom);
+        boolean isEditing = (formula == this.mNote.getFormulaMgr().getEditingFormula());
+
+        // 편집 중인 formula의 터치 영역을 먼저 그림
+        if (isEditing) {
+            g2.setColor(noteCanvas2D.COLOR_HIGHLIGHT);
+            // 모든 Edge의 터치 영역 먼저 그리기
+            for (noteFormulaEdge edge : formula.getEdges()) {
+                g2.fill(edge.getTouchArea());
+            }
+            // 모든 Atom의 터치 영역 그리기
+            for (noteFormulaAtom atom : formula.getAtoms()) {
+                g2.fill(atom.getTouchArea());
+            }
         }
 
-        // Edge 그리기
-        for (noteFormulaEdge edges : formula.getEdges()) {
-            renderEdges(g2, edges);
+        // 그 위에 Edge와 Atom 그리기
+        for (noteFormulaEdge edge : formula.getEdges()) {
+            renderEdges(g2, edge);
+        }
+
+        for (noteFormulaAtom atom : formula.getAtoms()) {
+            renderAtom(g2, atom);
         }
     }
 
@@ -219,14 +233,22 @@ public void renderPtCurve(Graphics2D g2, notePtCurve ptCurve) {
             double lastAngle = Math.atan2(lastDy, lastDx);
 
             // 마지막 엣지 방향에서 ±120도 방향만 허용
-            double angle1 = lastAngle + (Math.PI / 3);  // +120도
-            double angle2 = lastAngle - (Math.PI / 3);  // -120도
+            double angle1 = lastAngle + (Math.PI / 3);
+            angle1 = (angle1 % (2 * Math.PI) + (2 * Math.PI)) % (2 * Math.PI);
+            double angle2 = lastAngle - (Math.PI / 3);
+            angle2 = (angle2 % (2 * Math.PI) + (2 * Math.PI)) % (2 * Math.PI);
 
-            // 현재 각도와 가까운 쪽 선택
-            double diff1 = Math.abs(angle - angle1);
-            double diff2 = Math.abs(angle - angle2);
+            // 각도 차이를 0 ~ π로 정규화
+            double diff1 = Math.min(Math.abs(angle - angle1), 2 * Math.PI - Math.abs(angle - angle1));
+            double diff2 = Math.min(Math.abs(angle - angle2), 2 * Math.PI - Math.abs(angle - angle2));
 
+            // 가까운 각도를 선택
             angle = (diff1 < diff2) ? angle1 : angle2;
+            // // 현재 각도와 가까운 쪽 선택
+            // double diff1 = Math.abs(angle - angle1);
+            // double diff2 = Math.abs(angle - angle2);
+
+            // angle = (diff1 < diff2) ? angle1 : angle2;
         } else {
             // 엣지가 없는 경우 60도 간격 스냅
             double[] allowedAngles = {

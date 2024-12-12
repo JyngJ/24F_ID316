@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import note.cmd.noteCmdToCreatePtCurve;
 import note.noteApp;
+import note.noteFormula;
 import note.noteScene;
 import x.*;
 
@@ -60,31 +61,63 @@ public class noteDefaultScenario extends XScenario {
             points = new ArrayList<>();
         }
 
+        @Override
         public void handleMousePress(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
             Point pt = e.getPoint();
-            // Is on ColorChooser?
+            Point2D.Double pt2D = new Point2D.Double(pt.x, pt.y);
+
+            // ColorChooser 영역 체크
             if (pt.x >= 22 && pt.x < 105 && pt.y <= 60 && pt.y > 40) {
             } else {
-                noteCmdToCreatePtCurve.execute(note, pt);
-                XCmdToChangeScene.execute(note,
-                        noteDrawScenario.DrawScene.getSingleton(), this);
+                // Formula 터치 체크
+                boolean touchedFormula = false;
+                for (noteFormula formula : note.getFormulaMgr().getFormulas()) {
+                    if (formula.isTouchedBy(pt2D)) {
+                        touchedFormula = true;
+                        break;
+                    }
+                }
+
+                if (!touchedFormula) {
+                    // Formula를 터치하지 않은 경우 기존 PtCurve 생성 로직 실행
+                    noteCmdToCreatePtCurve.execute(note, pt);
+                    XCmdToChangeScene.execute(note,
+                            noteDrawScenario.DrawScene.getSingleton(), this);
+                }
             }
         }
 
         @Override
         public void handleMouseDrag(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            Point2D.Double currentPoint = new Point2D.Double(e.getX(), e.getY());
 
+            // 롱프레스 체크
+            if (note.getPenMarkMgr().isLongPress()) {
+                // Formula 터치 체크
+                for (noteFormula formula : note.getFormulaMgr().getFormulas()) {
+                    if (formula.isTouchedBy(currentPoint)) {
+                        // Formula를 편집 모드로 설정하고 Edit 씬으로 전환
+                        note.getFormulaMgr().setEditingFormula(formula);
+                        XCmdToChangeScene.execute(note,
+                                noteFormulaEditScenario.noteFormulaEditReadyScene.getSingleton(), this);
+                        return;
+                    }
+                }
+            }
         }
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
             Point pt = e.getPoint();
+
+            // 기존 마우스 릴리즈 처리
             Color c = note.getColorChooser().calcColor(pt,
                     note.getCanvas2D().getWidth(),
                     note.getCanvas2D().getHeight());
-            if (c != null) { // On ColorChooser
+            if (c != null) {
                 note.getCanvas2D().setCurrColorForPtCurve(c);
             }
             note.getPtCurveMgr().setCurrPtCurve(null);

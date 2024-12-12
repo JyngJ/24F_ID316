@@ -7,6 +7,7 @@ public class noteFormulaMgr {
 
     // constants
     public static final double ANGLE_SNAP = 120.0; // 스냅 각도 (120도)
+    public static final long LONG_PRESS_DURATION = 500; // 0.5초 (밀리초)
 
     // fields
     private noteFormula mCurrFormula = null;
@@ -72,6 +73,16 @@ public class noteFormulaMgr {
 
     public noteFormula getSelectedFormula() {
         return this.mSelectedFormula;
+    }
+
+    private noteFormula mEditingFormula = null;
+
+    public noteFormula getEditingFormula() {
+        return this.mEditingFormula;
+    }
+
+    public void setEditingFormula(noteFormula formula) {
+        this.mEditingFormula = formula;
     }
 
     // constructor
