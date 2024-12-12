@@ -53,4 +53,22 @@ public class noteFormula extends noteObject {
             atom.setPosition(new Point2D.Double(pos.x + dx, pos.y + dy));
         }
     }
+
+    public boolean isTouchedBy(Point2D.Double pt) {
+        // Atom 확인
+        for (noteFormulaAtom atom : mAtoms) {
+            if (atom.isTouchedBy(pt)) {
+                return true;
+            }
+        }
+
+        // Edge 확인
+        for (noteFormulaEdge edge : mEdges) {
+            if (edge.isTouchedBy(pt)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

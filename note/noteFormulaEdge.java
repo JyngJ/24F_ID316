@@ -118,4 +118,9 @@ public abstract class noteFormulaEdge {
         Point2D.Double end = endAtom.getPosition();
         return calculateTouchArea(start, end);
     }
+
+    public boolean isTouchedBy(Point2D.Double pt) {
+        // 터치 영역(Polygon)으로 검사
+        return this.touchArea.contains(pt.x, pt.y);
+    }
 }

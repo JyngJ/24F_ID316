@@ -3,8 +3,10 @@ package note.scenario;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import note.noteApp;
 import note.noteScene;
 import x.XApp;
+import x.XCmdToChangeScene;
 import x.XScenario;
 
 public class noteFormulaEditScenario extends XScenario {
@@ -73,7 +75,18 @@ public class noteFormulaEditScenario extends XScenario {
 
         @Override
         public void handleKeyDown(KeyEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            int code = e.getKeyCode();
 
+            switch (code) {
+                case KeyEvent.VK_ESCAPE:
+                    // 편집 모드 해제
+                    note.getFormulaMgr().setEditingFormula(null);
+
+                    // 이전 씬으로 돌아가기
+                    XCmdToChangeScene.execute(note, this.mReturnScene, null);
+                    break;
+            }
         }
 
         @Override
