@@ -11,6 +11,11 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import note.cmd.noteCmdToSelectObject;
 import note.noteApp;
+import note.noteBoundingBox;
+import note.noteCanvas2D;
+import note.notePtCurve;
+import note.notePtCurve.SelectState;
+import note.notePtCurveMgr;
 import note.noteScene;
 import x.XApp;
 import x.XCmdToChangeScene;
@@ -74,6 +79,7 @@ public class noteSelectScenario extends XScenario {
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
             noteCmdToSelectObject.execute((XApp) this.mScenario.getApp(), this.dragPath);
             this.dragPath.clear();
         }
@@ -85,9 +91,31 @@ public class noteSelectScenario extends XScenario {
 
         @Override
         public void handleKeyUp(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-                    XCmdToChangeScene.execute(this.mScenario.getApp(),
-                    noteDefaultScenario.ReadyScene.getSingleton(), null);
+            noteApp note = (noteApp) this.mScenario.getApp();
+            int code = e.getKeyCode();
+            switch (code) {
+                case KeyEvent.VK_SHIFT:
+                    notePtCurve ptCurve = note.getPtCurveMgr().getCurrPtCurve();
+                    if (ptCurve != null && ptCurve.getPts().size() > 1) {
+                        note.getPtCurveMgr().getPtCurves().add(ptCurve);
+                    }
+                    note.getPtCurveMgr().setCurrPtCurve(null);
+
+                    boolean hasSelectedCurve = false;
+                    for (notePtCurve curve : note.getPtCurveMgr().getPtCurves()) {
+                        if (curve.getSelectState() == SelectState.SELECTED) {
+                            hasSelectedCurve = true;
+                            break;
+                        }
+                    }
+                if (hasSelectedCurve) {
+                    XCmdToChangeScene.execute(note,
+                        noteSelectScenario.SelectedScene.getSingleton(), null);
+                } else {
+                    // SELECTED 상태의 곡선이 없으면 ReadyScene으로 변경
+                    XCmdToChangeScene.execute(note,
+                        noteDefaultScenario.ReadyScene.getSingleton(),null);
+                }
             }
         }
 
@@ -116,6 +144,7 @@ public class noteSelectScenario extends XScenario {
                 }
                 g2.draw(path);
             }
+            note.getCanvas2D().drawBoundingBoxForSelectedCurves(g2);
         }
 
         @Override
@@ -131,6 +160,9 @@ public class noteSelectScenario extends XScenario {
     
     
     public static class SelectedScene extends noteScene {
+        
+        private noteBoundingBox boundingBox;
+        
         // singleton pattern
         private static SelectedScene mSingleton = null;
         public static SelectedScene getSingleton() {
@@ -163,7 +195,43 @@ public class noteSelectScenario extends XScenario {
 
         @Override
         public void handleKeyDown(KeyEvent e) {
-                      
+            noteApp note = (noteApp) this.mScenario.getApp();
+    notePtCurveMgr curveMgr = note.getPtCurveMgr();
+    int code = e.getKeyCode();
+    
+    switch (code) {
+        case KeyEvent.VK_ESCAPE: // 선택 취소
+            // 선택된 곡선들만 따로 저장
+            ArrayList<notePtCurve> selectedCurves = new ArrayList<>();
+            for (notePtCurve ptCurve : note.getPtCurveMgr().getPtCurves()) {
+                if (ptCurve.getSelectState() == SelectState.SELECTED) {
+                    selectedCurves.add(ptCurve);
+                }
+            }
+            for (notePtCurve ptCurve : selectedCurves) {
+                ptCurve.setSelectState(SelectState.DEFAULT);
+            }
+
+            note.getCanvas2D().repaint();
+            break;
+
+        case KeyEvent.VK_E: // 선택된 곡선 지우기
+            ArrayList<notePtCurve> curvesToRemove = new ArrayList<>();
+            for (notePtCurve ptCurve : note.getPtCurveMgr().getPtCurves()) {
+                if (ptCurve.getSelectState() == SelectState.SELECTED) {
+                    curvesToRemove.add(ptCurve);  // 삭제할 곡선 추가
+                }
+            }
+
+            for (notePtCurve ptCurve : curvesToRemove) {
+                curveMgr.removeCurve(ptCurve);
+            }
+            break;
+    }
+            boundingBox = null;  // BoundingBox 지우기
+            note.getCanvas2D().repaint();
+            XCmdToChangeScene.execute(note,
+                        noteDefaultScenario.ReadyScene.getSingleton(), null);
         }
 
         @Override
@@ -183,7 +251,8 @@ public class noteSelectScenario extends XScenario {
 
         @Override
         public void renderScreenObjects(Graphics2D g2) {
-        
+            noteApp note = (noteApp) this.mScenario.getApp();
+            note.getCanvas2D().drawBoundingBoxForSelectedCurves(g2);
         }
 
         @Override

@@ -12,12 +12,14 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import javax.swing.JPanel;
+import note.notePtCurve;
+import note.notePtCurve.SelectState;
 import static note.notePtCurve.SelectState.DEFAULT;
 import static note.notePtCurve.SelectState.ERASE_SELECTED;
 import static note.notePtCurve.SelectState.SELECTED;
 
 public class noteCanvas2D extends JPanel {
-
+    
     private static final Color COLOR_PT_CURVE_DEFAULT = new Color(0, 0, 0, 192);
 
     private static final Stroke STROKE_PT_CURVE_DEFAULT
@@ -62,6 +64,8 @@ public class noteCanvas2D extends JPanel {
     public Stroke getCurrStrokeForPtCurve() {
         return mCurrStrokeForPtCurve;
     }
+    
+    public noteBoundingBox boundingBox = new noteBoundingBox();
 
     private noteFormulaRenderer mRenderer;
 
@@ -248,4 +252,89 @@ public class noteCanvas2D extends JPanel {
         }
         g2.draw(path);
     }
+    
+    // For Drawing BoundingBox
+    public void drawBoundingBoxForSelectedCurves(Graphics2D g2) {
+        final int GAP = 5;
+        if (boundingBox == null) {
+            boundingBox = new noteBoundingBox();
+        }
+        ArrayList<notePtCurve> selectedCurves = new ArrayList<>();
+        for (notePtCurve ptCurve : this.mNote.getPtCurveMgr().getPtCurves()) {
+            if (ptCurve.getSelectState() == SelectState.SELECTED) {
+                selectedCurves.add(ptCurve);
+            }
+        }
+
+        if (!selectedCurves.isEmpty()) {
+            // BoundingBox 계산
+            double minX = Double.MAX_VALUE, maxX = Double.MIN_VALUE;
+            double minY = Double.MAX_VALUE, maxY = Double.MIN_VALUE;
+
+            for (notePtCurve curve : selectedCurves) {
+                for (Point2D.Double pt : curve.getPts()) {
+                    minX = Math.min(minX, pt.x);
+                    maxX = Math.max(maxX, pt.x);
+                    minY = Math.min(minY, pt.y);
+                    maxY = Math.max(maxY, pt.y);
+                }
+            }
+
+            // BoundingBox 설정
+            boundingBox.setBoundingBox(minX, minY, maxX, maxY);
+            boundingBox.draw(g2);
+            drawScaleHandles(g2, minX - GAP, minY - GAP, maxX + GAP, maxY + GAP);
+        }
+    }
+
+    // BoundingBox 지우기
+    public void clearBoundingBox() {
+        boundingBox = null;
+        repaint();  // 화면 새로 고침
+    }
+    
+//    public void drawBoundingBoxForSelectedCurves(Graphics2D g2) {
+//        final int GAP = 5;
+//        ArrayList<notePtCurve> selectedCurves = new ArrayList<>();
+//        for (notePtCurve ptCurve : this.mNote.getPtCurveMgr().getPtCurves()) {
+//            if (ptCurve.getSelectState() == SelectState.SELECTED) {
+//                selectedCurves.add(ptCurve);
+//            }
+//        }
+//
+//        if (!selectedCurves.isEmpty()) {
+//            // BoundingBox 계산
+//            double minX = Double.MAX_VALUE, maxX = Double.MIN_VALUE;
+//            double minY = Double.MAX_VALUE, maxY = Double.MIN_VALUE;
+//
+//            for (notePtCurve curve : selectedCurves) {
+//                for (Point2D.Double pt : curve.getPts()) {
+//                    minX = Math.min(minX, pt.x);
+//                    maxX = Math.max(maxX, pt.x);
+//                    minY = Math.min(minY, pt.y);
+//                    maxY = Math.max(maxY, pt.y);
+//                }
+//            }
+//
+//            // BoundingBox 그리기
+//            g2.setColor(Color.ORANGE);
+//            g2.setStroke(DASHED_STROKE);
+//            g2.drawRect((int) minX - GAP, (int) minY - GAP,
+//                (int) (maxX - minX + 2 * GAP), (int) (maxY - minY) + 2 * GAP);
+//            
+//            // ScaleHandle 그리기
+//            drawScaleHandles(g2, minX - GAP, minY - GAP, maxX + GAP, maxY + GAP);
+//        }
+//    }
+
+    public void drawScaleHandles(Graphics2D g2, double minX, double minY, double maxX, double maxY) {
+        final int HANDLE_SIZE = 5;
+        g2.setColor(Color.ORANGE);
+        // BoundingBox 네 꼭짓점에 동그라미
+        g2.fill(new Ellipse2D.Double(minX - HANDLE_SIZE / 2, minY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
+        g2.fill(new Ellipse2D.Double(maxX - HANDLE_SIZE / 2, minY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
+        g2.fill(new Ellipse2D.Double(minX - HANDLE_SIZE / 2, maxY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
+        g2.fill(new Ellipse2D.Double(maxX - HANDLE_SIZE / 2, maxY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
+    }
+    
 }
