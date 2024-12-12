@@ -66,4 +66,17 @@ public class noteFormulaAtom {
         return this.touchArea.contains(pt);
     }
 
+    public void translateTouchAreaTo(double dx, double dy) {
+        if (this.touchArea != null) {
+            // 현재 터치 영역의 위치와 크기 가져오기
+            double x = touchArea.getX();
+            double y = touchArea.getY();
+            double width = touchArea.getWidth();
+            double height = touchArea.getHeight();
+
+            // 새로운 위치로 이동
+            touchArea.setFrame(x + dx, y + dy, width, height);
+        }
+    }
+
 }

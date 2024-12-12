@@ -3,7 +3,10 @@ package note.scenario;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import note.noteApp;
+import note.noteFormula;
+import note.noteFormulaEdge;
 import note.noteScene;
 import x.XApp;
 import x.XCmdToChangeScene;
@@ -60,7 +63,21 @@ public class noteFormulaEditScenario extends XScenario {
 
         @Override
         public void handleMousePress(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            Point2D.Double pt = new Point2D.Double(e.getX(), e.getY());
 
+            // 펜집 중인 formula의 edge 터치 체크
+            noteFormula editingFormula = note.getFormulaMgr().getEditingFormula();
+            if (editingFormula != null) {
+                for (noteFormulaEdge edge : editingFormula.getEdges()) {
+                    if (edge.isTouchedBy(pt)) {
+                        // Edge가 터치되면 MoveScene으로 전환
+                        XCmdToChangeScene.execute(note,
+                                noteFormulaEditScenario.noteFormulaMoveScene.getSingleton(), this.mReturnScene);
+                        return;
+                    }
+                }
+            }
         }
 
         @Override
@@ -111,7 +128,7 @@ public class noteFormulaEditScenario extends XScenario {
 
         @Override
         public void getReady() {
-
+            // 펜 마크 관리는 이벤트 리스너에서 처리
         }
 
         @Override
@@ -144,17 +161,33 @@ public class noteFormulaEditScenario extends XScenario {
 
         @Override
         public void handleMousePress(MouseEvent e) {
-
         }
 
         @Override
         public void handleMouseDrag(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
 
+            // formula 이동
+            noteFormula editingFormula = note.getFormulaMgr().getEditingFormula();
+            System.out.println("isDragging: " + note.getPenMarkMgr().isDragging());
+            if (editingFormula != null && note.getPenMarkMgr().isDragging()) {
+                Point2D.Double relativeDistance = note.getPenMarkMgr().getRelativeDistance();
+                if (relativeDistance != null) {
+                    editingFormula.translateTo(relativeDistance.x, relativeDistance.y);
+                    note.getCanvas2D().repaint();
+                }
+            }
         }
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
 
+            // EditReadyScene으로 돌아가기
+            XCmdToChangeScene.execute(note,
+                    noteFormulaEditScenario.noteFormulaEditReadyScene.getSingleton(), this.mReturnScene);
+
+            note.getCanvas2D().repaint();
         }
 
         @Override
@@ -184,7 +217,7 @@ public class noteFormulaEditScenario extends XScenario {
 
         @Override
         public void getReady() {
-
+            // getReady에서 초기화하지 않음
         }
 
         @Override
@@ -266,8 +299,8 @@ public class noteFormulaEditScenario extends XScenario {
         }
     }
 
-    // 엣지 변환, 삭제가 일어날 씬 
-    // 엣지도, 아톰도 아닌 다른 곳을 클릭했을때 이곳으로 들어옴
+    // 지 변환, 삭제가 일어날 씬 
+    // 엣지도, 아톰도 아닌 다른 곳을 릭했을때 이곳으로 들어옴
     public static class noteFormulaGestureScene extends noteScene {
 
         // singleton pattern

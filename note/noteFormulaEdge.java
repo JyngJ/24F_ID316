@@ -123,4 +123,28 @@ public abstract class noteFormulaEdge {
         // 터치 영역(Polygon)으로 검사
         return this.touchArea.contains(pt.x, pt.y);
     }
+
+    public void translateTouchAreaTo(double dx, double dy) {
+        if (this.touchArea != null) {
+            // Polygon의 모든 점을 이동
+            for (int i = 0; i < touchArea.npoints; i++) {
+                touchArea.xpoints[i] += dx;
+                touchArea.ypoints[i] += dy;
+            }
+            // Polygon의 경계 상자 업데이트
+            touchArea.invalidate();
+        }
+    }
+
+    public void translateTo(double dx, double dy) {
+        // 시작점과 끝점의 위치 업데이트
+        Point2D.Double start = startAtom.getPosition();
+        Point2D.Double end = endAtom.getPosition();
+
+        // 방향 벡터 업데이트
+        this.direction = calculateDirection(start, end);
+
+        // 터치 영역 업데이트
+        this.touchArea = calculateTouchArea(start, end);
+    }
 }
