@@ -78,8 +78,6 @@ public class noteApp extends XApp {
     // Entry point of note project, create a note instance
     public static void main(String[] args) {
         new noteApp();
-    }
-
-    
+    } 
     
 }

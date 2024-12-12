@@ -58,7 +58,7 @@ public class noteDefaultScenario extends XScenario {
             noteApp note = (noteApp) this.mScenario.getApp();
             Point pt = e.getPoint();
             // Is on ColorChooser?
-            if (pt.x >= 650 && pt.x < 730 && pt.y > 20) {
+            if (pt.x >= 22 && pt.x < 105 && pt.y <= 60 && pt.y >40) {
             } else {
             noteCmdToCreatePtCurve.execute(note, pt);
             XCmdToChangeScene.execute(note, 
@@ -96,6 +96,10 @@ public class noteDefaultScenario extends XScenario {
                 case KeyEvent.VK_E:
                     XCmdToChangeScene.execute(note, 
                         noteDrawScenario.EraseScene.getSingleton(), this);
+                    break;
+                case KeyEvent.VK_SHIFT:
+                    XCmdToChangeScene.execute(note, 
+                        noteSelectScenario.SelectScene.getSingleton(), this);
                     break;
             }
         }

@@ -1,7 +1,8 @@
+
 package note.cmd;
 
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import note.noteApp;
 import note.notePtCurve;
@@ -12,13 +13,13 @@ import x.XLoggableCmd;
 public class noteCmdToErasePtCurve extends XLoggableCmd {
     private ArrayList<Point2D> dragPath;
 
-    private noteCmdToErasePtCurve(XApp app, ArrayList<Point2D> dragPath) {
+    private noteCmdToErasePtCurve(XApp app, ArrayList<Point2D> dragPath, boolean isFinalErase) {
         super(app);
         this.dragPath = dragPath;
     }
 
-    public static boolean execute(XApp app, ArrayList<Point2D> dragPath) {
-        noteCmdToErasePtCurve cmd = new noteCmdToErasePtCurve(app, dragPath);
+    public static boolean execute(XApp app, ArrayList<Point2D> dragPath, boolean isFinalErase) {
+        noteCmdToErasePtCurve cmd = new noteCmdToErasePtCurve(app, dragPath, isFinalErase);
         return cmd.execute();
     }
 
@@ -26,42 +27,44 @@ public class noteCmdToErasePtCurve extends XLoggableCmd {
     protected boolean defineCmd() {
         noteApp note = (noteApp) this.mApp;
         notePtCurveMgr curveMgr = note.getPtCurveMgr();
-
-        // 드래그 영역의 최소 Bounding Box 계산
-        Rectangle2D.Double dragBox = this.getBoundingBox(this.dragPath);
-
-        // 곡선 제거
+        
+        // 드래그 경로 -> Path2D
+        Path2D dragPath2D = createPathFromDragPoints(this.dragPath);
+        
+        // 삭제할 곡선 선택
         ArrayList<notePtCurve> curvesToRemove = new ArrayList<>();
         for (notePtCurve curve : curveMgr.getPtCurves()) {
-            if (this.isCurveInBox(curve, dragBox)) {
+            boolean isIntersecting = isCurveInPath(curve, dragPath2D);
+            if (isIntersecting && (curve.getSelectState() ==
+                notePtCurve.SelectState.ERASE_SELECTED))
                 curvesToRemove.add(curve);
-            }
         }
-
+        
+        // 제거
         for (notePtCurve curve : curvesToRemove) {
             curveMgr.removeCurve(curve);
         }
-
         return true;
     }
 
-    private Rectangle2D.Double getBoundingBox(ArrayList<Point2D> points) {
-        double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
-        double maxX = Double.MIN_VALUE, maxY = Double.MIN_VALUE;
-
-        for (Point2D pt : points) {
-            minX = Math.min(minX, pt.getX());
-            minY = Math.min(minY, pt.getY());
-            maxX = Math.max(maxX, pt.getX());
-            maxY = Math.max(maxY, pt.getY());
+    // Drag Point -> Path2D
+    private Path2D createPathFromDragPoints(ArrayList<Point2D> dragPoints) {
+        Path2D path = new Path2D.Double();
+        if (!dragPoints.isEmpty()) {
+            path.moveTo(dragPoints.get(0).getX(),
+                dragPoints.get(0).getY());
+            for (int i = 1; i < dragPoints.size(); i++) {
+                path.lineTo(dragPoints.get(i).getX(),
+                    dragPoints.get(i).getY());
+            }
         }
-
-        return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
+        return path;
     }
-
-    private boolean isCurveInBox(notePtCurve curve, Rectangle2D.Double box) {
+    
+    // 곡선이 경로에 포함되는지
+    private boolean isCurveInPath(notePtCurve curve, Path2D path) {
         for (Point2D pt : curve.getPts()) {
-            if (box.contains(pt)) {
+            if (path.contains(pt)) {
                 return true;
             }
         }
