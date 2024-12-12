@@ -4,9 +4,11 @@ import note.scenario.noteDefaultScenario;
 import note.scenario.noteDrawScenario;
 import note.scenario.noteFormulaScenario;
 import note.scenario.noteSelectScenario;
+import note.scenario.noteFormulaDrawScenario;
 import x.XScenarioMgr;
 
 public class noteScenarioMgr extends XScenarioMgr {
+
     // constructor
     public noteScenarioMgr(noteApp note) {
         super(note);
@@ -15,7 +17,7 @@ public class noteScenarioMgr extends XScenarioMgr {
     @Override
     protected void addScenarios() {
         this.addScenario(noteDefaultScenario.createSingleton(this.mApp));
-        this.addScenario(noteFormulaScenario.createSingleton(this.mApp));
+        this.addScenario(noteFormulaDrawScenario.createSingleton(this.mApp));
         this.addScenario(noteDrawScenario.createSingleton(this.mApp));
         this.addScenario(noteSelectScenario.createSingleton(this.mApp));
 //        this.addScenario(JSIGestureScenario.createSingleton(this.mApp));
@@ -27,5 +29,5 @@ public class noteScenarioMgr extends XScenarioMgr {
     protected void setInitCurrScene() {
         this.setCurrScene(noteDefaultScenario.ReadyScene.getSingleton());
     }
-    
+
 }
