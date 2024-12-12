@@ -22,30 +22,30 @@ import x.XApp;
 import x.XCmdToChangeScene;
 import x.XScenario;
 
-public class noteFormulaScenario extends XScenario {
+public class noteFormulaDrawScenario extends XScenario {
 
     // singleton
-    private static noteFormulaScenario mSingleton = null;
+    private static noteFormulaDrawScenario mSingleton = null;
 
-    public static noteFormulaScenario getSingleton() {
-        assert (noteFormulaScenario.mSingleton != null);
-        return noteFormulaScenario.mSingleton;
+    public static noteFormulaDrawScenario getSingleton() {
+        assert (noteFormulaDrawScenario.mSingleton != null);
+        return noteFormulaDrawScenario.mSingleton;
     }
 
-    public static noteFormulaScenario createSingleton(XApp app) {
-        assert (noteFormulaScenario.mSingleton == null);
-        noteFormulaScenario.mSingleton = new noteFormulaScenario(app);
-        return noteFormulaScenario.mSingleton;
+    public static noteFormulaDrawScenario createSingleton(XApp app) {
+        assert (noteFormulaDrawScenario.mSingleton == null);
+        noteFormulaDrawScenario.mSingleton = new noteFormulaDrawScenario(app);
+        return noteFormulaDrawScenario.mSingleton;
     }
 
-    private noteFormulaScenario(XApp app) {
+    private noteFormulaDrawScenario(XApp app) {
         super(app);
     }
 
     @Override
     protected void addScenes() {
-        this.addScene(noteFormulaScenario.FormulaReadyScene.createSingleton(this));
-        this.addScene(noteFormulaScenario.FormulaDrawScene.createSingleton(this));
+        this.addScene(noteFormulaDrawScenario.FormulaReadyScene.createSingleton(this));
+        this.addScene(noteFormulaDrawScenario.FormulaDrawScene.createSingleton(this));
     }
 
     public static class FormulaReadyScene extends noteScene {
@@ -93,7 +93,7 @@ public class noteFormulaScenario extends XScenario {
 
                         // 씬 전환
                         XCmdToChangeScene.execute(note,
-                                noteFormulaScenario.FormulaDrawScene.getSingleton(),
+                                noteFormulaDrawScenario.FormulaDrawScene.getSingleton(),
                                 this.mReturnScene);
                         return;
                     }
@@ -114,7 +114,7 @@ public class noteFormulaScenario extends XScenario {
 
             // 씬 전환
             XCmdToChangeScene.execute(note,
-                    noteFormulaScenario.FormulaDrawScene.getSingleton(),
+                    noteFormulaDrawScenario.FormulaDrawScene.getSingleton(),
                     this.mReturnScene);
         }
 
@@ -345,7 +345,7 @@ public class noteFormulaScenario extends XScenario {
 
                         // 씬 전환
                         XCmdToChangeScene.execute(note,
-                                noteFormulaScenario.FormulaReadyScene.getSingleton(),
+                                noteFormulaDrawScenario.FormulaReadyScene.getSingleton(),
                                 this.mReturnScene);
                         return;
                     }
@@ -363,7 +363,7 @@ public class noteFormulaScenario extends XScenario {
 
             // 씬 전환
             XCmdToChangeScene.execute(note,
-                    noteFormulaScenario.FormulaReadyScene.getSingleton(),
+                    noteFormulaDrawScenario.FormulaReadyScene.getSingleton(),
                     this.mReturnScene);
         }
 

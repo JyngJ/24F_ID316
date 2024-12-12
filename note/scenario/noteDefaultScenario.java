@@ -9,46 +9,52 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import note.cmd.noteCmdToCreatePtCurve;
 import note.noteApp;
-import x.*;
 import note.noteScene;
+import x.*;
 
 public class noteDefaultScenario extends XScenario {
+
     // singleton
     private static noteDefaultScenario mSingleton = null;
+
     public static noteDefaultScenario getSingleton() {
-        assert(noteDefaultScenario.mSingleton != null);
+        assert (noteDefaultScenario.mSingleton != null);
         return noteDefaultScenario.mSingleton;
     }
+
     public static noteDefaultScenario createSingleton(XApp app) {
-        assert(noteDefaultScenario.mSingleton == null);
+        assert (noteDefaultScenario.mSingleton == null);
         noteDefaultScenario.mSingleton = new noteDefaultScenario(app);
         return noteDefaultScenario.mSingleton;
     }
-    
+
     protected noteDefaultScenario(XApp app) {
         super(app);
     }
-    
+
     @Override
     protected void addScenes() {
         this.addScene(noteDefaultScenario.ReadyScene.createSingleton(this));
     }
-    
+
     public static class ReadyScene extends noteScene {
 
         public ArrayList<Point2D> points;
 
         // singleton pattern
         private static ReadyScene mSingleton = null;
+
         public static ReadyScene getSingleton() {
-            assert(ReadyScene.mSingleton != null);
+            assert (ReadyScene.mSingleton != null);
             return ReadyScene.mSingleton;
         }
+
         public static ReadyScene createSingleton(XScenario scenario) {
-            assert(ReadyScene.mSingleton == null);
+            assert (ReadyScene.mSingleton == null);
             ReadyScene.mSingleton = new ReadyScene(scenario);
             return ReadyScene.mSingleton;
         }
+
         private ReadyScene(XScenario scenario) {
             super(scenario);
             points = new ArrayList<>();
@@ -60,8 +66,8 @@ public class noteDefaultScenario extends XScenario {
             // Is on ColorChooser?
             if (pt.x >= 650 && pt.x < 730 && pt.y > 20) {
             } else {
-            noteCmdToCreatePtCurve.execute(note, pt);
-            XCmdToChangeScene.execute(note, 
+                noteCmdToCreatePtCurve.execute(note, pt);
+                XCmdToChangeScene.execute(note,
                         noteDrawScenario.DrawScene.getSingleton(), this);
             }
         }
@@ -69,15 +75,15 @@ public class noteDefaultScenario extends XScenario {
         @Override
         public void handleMouseDrag(MouseEvent e) {
 
-            }
+        }
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
             Point pt = e.getPoint();
             Color c = note.getColorChooser().calcColor(pt,
-                        note.getCanvas2D().getWidth(),
-                        note.getCanvas2D().getHeight());
+                    note.getCanvas2D().getWidth(),
+                    note.getCanvas2D().getHeight());
             if (c != null) { // On ColorChooser
                 note.getCanvas2D().setCurrColorForPtCurve(c);
             }
@@ -90,12 +96,12 @@ public class noteDefaultScenario extends XScenario {
             int code = e.getKeyCode();
             switch (code) {
                 case KeyEvent.VK_F:             // will be changed
-                    XCmdToChangeScene.execute(note, 
-                        noteFormulaScenario.FormulaReadyScene.getSingleton(), this);
+                    XCmdToChangeScene.execute(note,
+                            noteFormulaDrawScenario.FormulaReadyScene.getSingleton(), this);
                     break;
                 case KeyEvent.VK_E:
-                    XCmdToChangeScene.execute(note, 
-                        noteDrawScenario.EraseScene.getSingleton(), this);
+                    XCmdToChangeScene.execute(note,
+                            noteDrawScenario.EraseScene.getSingleton(), this);
                     break;
             }
         }
@@ -124,6 +130,6 @@ public class noteDefaultScenario extends XScenario {
         @Override
         public void wrapUp() {
         }
-    
+
     }
 }
