@@ -215,10 +215,21 @@ public class noteDrawScenario extends XScenario {
         
         @Override
         public void handleKeyUp(KeyEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            ArrayList<notePtCurve> curvesToRemove = new ArrayList<>();
             if (e.getKeyCode() == KeyEvent.VK_E) {
+                for (notePtCurve curve : note.getPtCurveMgr().getPtCurves()) {
+                    if (curve.getSelectState() ==
+                        notePtCurve.SelectState.ERASE_SELECTED) {
+                        curvesToRemove.add(curve);
+                    }
+                }
+                for (notePtCurve curve : curvesToRemove) {
+                    note.getPtCurveMgr().removeCurve(curve);
+                }
                 XCmdToChangeScene.execute(this.mScenario.getApp(),
                     noteDefaultScenario.ReadyScene.getSingleton(), null);
-        }
+            }
         }
 
         @Override
