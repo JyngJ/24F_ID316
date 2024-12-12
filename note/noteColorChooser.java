@@ -24,8 +24,8 @@ public class noteColorChooser {
         double dy = 20;
         
         for (int i = 0 ; i < 4 ; i++) {
-            double y = 20;
-            double x = 650 + dx * i;
+            double y = 45;
+            double x = 22 + dx * i;
             Rectangle2D rect = new Rectangle2D.Double(x, y, dx, dy);
             g2.setColor(mColors[i]);
             g2.fill(rect);
@@ -34,7 +34,7 @@ public class noteColorChooser {
     
     public Color calcColor(Point pt, int w, int h) {
         double dx = 20;
-        int i = (int)((double)(pt.x - 650) / dx);
+        int i = (int)((double)(pt.x - 25) / dx);
         if (i >= 0 && i < 4) {
             return this.mColors[i];
         } else {

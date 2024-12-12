@@ -12,18 +12,29 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import javax.swing.JPanel;
+import static note.notePtCurve.SelectState.DEFAULT;
+import static note.notePtCurve.SelectState.ERASE_SELECTED;
+import static note.notePtCurve.SelectState.SELECTED;
 
 public class noteCanvas2D extends JPanel {
 
     private static final Color COLOR_PT_CURVE_DEFAULT = new Color(0, 0, 0, 192);
-
-    private static final Stroke STROKE_PT_CURVE_DEFAULT
-            = new BasicStroke(5f,
-                    BasicStroke.CAP_ROUND,
+    
+    private static final Stroke STROKE_PT_CURVE_DEFAULT = 
+            new BasicStroke(2f, 
+                    BasicStroke.CAP_ROUND, 
                     BasicStroke.JOIN_ROUND);
-
-    private static final Font FONT_INFO
-            = new Font("Monospaced", Font.PLAIN, 24);
+    
+    public static final Stroke DASHED_STROKE = new BasicStroke(
+        2f,                      
+        BasicStroke.CAP_ROUND,
+        BasicStroke.JOIN_ROUND,
+        10f,
+        new float[]{3f, 5f},
+        0f);  
+    
+    private static final Font FONT_INFO = 
+            new Font("Monospaced", Font.PLAIN, 24);
     private static final Color COLOR_INFO = Color.black;
     private static final float INFO_TOP_ALIGNMENT_X = 20;
     private static final float INFO_TOP_ALIGNMENT_Y = 30;
@@ -81,7 +92,7 @@ public class noteCanvas2D extends JPanel {
         // draw pen tip
         mNote.getColorChooser().drawCells(g2,this.getWidth(),this.getHeight());
         Ellipse2D.Double e = 
-                new Ellipse2D.Double(750, 30 - 2.5f, 5f, 5f);
+                new Ellipse2D.Double(125, 55 - 2.5f, 5f, 5f);
         g2.setColor(this.mCurrColorForCurve);
         g2.fill(e);
 
@@ -165,18 +176,6 @@ public class noteCanvas2D extends JPanel {
 //        );
 //    }
 
-
-
-
-    private void drawPtCurves(Graphics2D g2) {
-        for (notePtCurve ptCurve: this.mNote.getPtCurveMgr().getPtCurves()){
-            this.drawPtCurve(g2,
-                    ptCurve,
-                    ptCurve.getColor(),
-                    ptCurve.getStroke());
-        }
-    }
-
     // Draw the in-progress curve
     private void drawCurrPtCurve(Graphics2D g2) {
         notePtCurve ptCurve = this.mNote.getPtCurveMgr().getCurrPtCurve();
@@ -206,6 +205,47 @@ public class noteCanvas2D extends JPanel {
         g2.setStroke(s);
         g2.draw(path);
     }
+    
+    private void drawPtCurves(Graphics2D g2) {
+      for (notePtCurve ptCurve : this.mNote.getPtCurveMgr().getPtCurves()) {
+        Color color = ptCurve.getColor();
+        Stroke stroke = ptCurve.getStroke();
 
+        switch (ptCurve.getSelectState()) {
+            case SELECTED: // Select mode에서 선택
+                g2.setColor(new Color(255, 255, 50, 100)); // 노란색 헤일로(임시)
+                g2.setStroke(new BasicStroke(6f));
+                this.drawPtCurveOutline(g2, ptCurve); // 테두리(외곽선)만 그리기
+                break;
+            case ERASE_SELECTED:
+                color = new Color(color.getRed(),
+                    color.getGreen(),
+                    color.getBlue(),
+                    50); // 불투명도 낮게
+                break;
+            case DEFAULT: // 일반 펜
+                break;
+        }
+
+        this.drawPtCurve(g2, ptCurve, color, stroke);
+      }
+    }
+    
+    // 외곽선 그리기 method
+    private void drawPtCurveOutline(Graphics2D g2, notePtCurve ptCurve) {
+        Path2D.Double path = new Path2D.Double();
+        ArrayList<Point2D.Double> pts = ptCurve.getPts();
+        if (pts.size() < 2) {
+            // 곡선이 하나의 점으로 구성된 경우 안 그림
+            return;
+        }
+        Point2D.Double pt0 = pts.get(0);
+        path.moveTo(pt0.x, pt0.y);
+        for (int i = 1; i < pts.size(); i++) {
+            Point2D.Double pt = pts.get(i);
+            path.lineTo(pt.x, pt.y);
+        }
+        g2.draw(path);
+    }
 }
 

@@ -154,19 +154,64 @@ public class noteDrawScenario extends XScenario {
             this.dragPath.add(e.getPoint());
         }
 
+//        @Override
+//        public void handleMouseDrag(MouseEvent e) {
+//            this.dragPath.add(e.getPoint());
+//            
+//        }
+//
+//        @Override
+//        public void handleMouseRelease(MouseEvent e) {
+//            noteApp note = (noteApp) this.mScenario.getApp();
+//            this.dragPath.add(e.getPoint());
+//            noteCmdToErasePtCurve.execute(note, this.dragPath);
+//            this.dragPath.clear();
+//            XCmdToChangeScene.execute(note, noteDefaultScenario.ReadyScene.getSingleton(), null);
+//        }
         @Override
         public void handleMouseDrag(MouseEvent e) {
-            this.dragPath.add(e.getPoint());
+            noteApp note = (noteApp) this.mScenario.getApp();
+            Point2D dragPoint = e.getPoint();
+
+            // 드래그 경로와 겹치면 ERASE_SELECTED로 설정
+            for (notePtCurve curve : note.getPtCurveMgr().getPtCurves()) {
+                if (isPointNearCurve(curve, dragPoint)) {
+                    curve.setSelectState(notePtCurve.SelectState.ERASE_SELECTED);
+                }
+            }
         }
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
-            this.dragPath.add(e.getPoint());
-            noteCmdToErasePtCurve.execute(note, this.dragPath);
-            this.dragPath.clear();
-            XCmdToChangeScene.execute(note, noteDefaultScenario.ReadyScene.getSingleton(), null);
+            // ERASE_SELECTED 상태의 곡선 제거
+            ArrayList<notePtCurve> curvesToRemove = new ArrayList<>();
+            for (notePtCurve curve : note.getPtCurveMgr().getPtCurves()) {
+                if (curve.getSelectState() == notePtCurve.SelectState.ERASE_SELECTED) {
+                    curvesToRemove.add(curve);
+                }
+            }
+            for (notePtCurve curve : curvesToRemove) {
+                note.getPtCurveMgr().removeCurve(curve);
+            }
+
+            // 상태 초기화
+            for (notePtCurve curve : note.getPtCurveMgr().getPtCurves()) {
+                curve.setSelectState(notePtCurve.SelectState.DEFAULT);
+            }
         }
+
+        private boolean isPointNearCurve(notePtCurve curve, Point2D dragPoint) {
+            final double THRESHOLD = 10.0; // 드래그 포인트와 곡선 점 간의 최대 허용 거리
+
+            for (Point2D.Double pt : curve.getPts()) {
+                if (pt.distance(dragPoint) <= THRESHOLD) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         
         @Override
         public void handleKeyUp(KeyEvent e) {
