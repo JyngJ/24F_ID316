@@ -10,8 +10,6 @@ public class noteFormulaMgr {
     public static final long LONG_PRESS_DURATION = 500; // 0.5초 (밀리초)
 
     // fields
-    private noteFormula mCurrFormula = null;
-
     // 현재 작업 중인 엣지와 아톰들을 추적하기 위한 리스트
     private ArrayList<noteFormulaEdge> mPrevEdges = null;
     private ArrayList<noteFormulaAtom> mPrevAtoms = null;
@@ -26,70 +24,77 @@ public class noteFormulaMgr {
     public ArrayList<noteFormulaAtom> getPrevAtoms() {
         return this.mPrevAtoms;
     }
-    
     public void setPrevAtoms(ArrayList<noteFormulaAtom> at) {
         this.mPrevAtoms = at;
     }
 
+    private noteFormula mCurrFormula = null;
     public noteFormula getCurrFormula() {
         return this.mCurrFormula;
     }
-
     public void setCurrFormula(noteFormula formula) {
         this.mCurrFormula = formula;
     }
 
     private noteFormulaAtomTemp mTempAtom = null;
-
     public noteFormulaAtomTemp getAtopTemp() {
         return this.mTempAtom;
     }
-
     public void setAtomTemp(noteFormulaAtomTemp tempAtom) {
         this.mTempAtom = tempAtom;
     }
 
     private noteFormulaEdgeTemp mTempEdge = null;
-
     public noteFormulaEdgeTemp getEdgeTemp() {
         return this.mTempEdge;
     }
-
     public void setEdgeTemp(noteFormulaEdgeTemp tempEdge) {
         this.mTempEdge = tempEdge;
     }
 
     // 현재 엣지가 시작되고 있는 atom
     private noteFormulaAtom mCurrAtom = null;
-
     public noteFormulaAtom getCurrAtom() {
         return this.mCurrAtom;
     }
-
     public void setCurrAtom(noteFormulaAtom atom) {
         this.mCurrAtom = atom;
     }
 
     private ArrayList<noteFormula> mFormulas = null;
-
     public ArrayList<noteFormula> getFormulas() {
         return this.mFormulas;
     }
 
     private noteFormula mSelectedFormula = null;
-
     public noteFormula getSelectedFormula() {
         return this.mSelectedFormula;
     }
 
     private noteFormula mEditingFormula = null;
-
     public noteFormula getEditingFormula() {
         return this.mEditingFormula;
     }
-
     public void setEditingFormula(noteFormula formula) {
         this.mEditingFormula = formula;
+    }
+    
+    // 원자 수정시 대상이 되는 원자 
+    private noteFormulaAtom mEditingAtom = null;
+    public noteFormulaAtom getEditingAtom() {
+        return this.mEditingAtom;
+    }
+    public void setEditingAtom(noteFormulaAtom atom) {
+        this.mEditingAtom = atom;
+    }
+    
+    // 엣지 수정시 대상이 되는 엣지 
+    private noteFormulaEdge mEditingEdge = null;
+    public noteFormulaEdge getEditingEdge() {
+        return this.mEditingEdge;
+    }
+    public void setEditingEdge(noteFormulaEdge edge) {
+        this.mEditingEdge = edge;
     }
 
     // constructor

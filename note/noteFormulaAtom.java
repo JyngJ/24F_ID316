@@ -13,12 +13,15 @@ public class noteFormulaAtom {
 
     // Atom의 터치 영역 (Ellipse2D)
     private Ellipse2D.Double touchArea;
+    
+    public static final float ATOM_RADIUS = 15;
+    public static final float ATOM_TOUCH_AREA_RADIUS = (float) (1.5 * ATOM_RADIUS);
 
     // 생성자
     public noteFormulaAtom(String type, Point2D.Double position) {
         this.atomType = type;
         this.position = position;
-        float tr = noteCanvas2D.ATOM_TOUCH_AREA_RADIUS;
+        float tr = ATOM_TOUCH_AREA_RADIUS;
 
         // 터치 영역을 원형으로 정의
         this.touchArea = new Ellipse2D.Double(
@@ -53,7 +56,7 @@ public class noteFormulaAtom {
 
     // 터치 영역 갱신 메서드
     private void updateTouchArea() {
-        float tr = noteCanvas2D.ATOM_TOUCH_AREA_RADIUS;
+        float tr = ATOM_TOUCH_AREA_RADIUS;
         this.touchArea.setFrame(
                 position.x - tr,
                 position.y - tr,

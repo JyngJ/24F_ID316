@@ -43,8 +43,6 @@ public class noteCanvas2D extends JPanel {
     private static final float INFO_TOP_ALIGNMENT_Y = 30;
 
     public static final float EDGE_TOUCH_AREA_WIDTH = 30;
-    public static final float ATOM_RADIUS = 15;
-    public static final float ATOM_TOUCH_AREA_RADIUS = 2 * ATOM_RADIUS;
 
     public static final Color COLOR_HIGHLIGHT = new Color(255, 180, 50); // 주황색 하이라이트 (불투명)
 
