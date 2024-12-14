@@ -14,6 +14,9 @@ import note.cmd.noteCmdToSelectObject;
 import note.noteApp;
 import note.noteBoundingBox;
 import note.noteCanvas2D;
+import note.noteFormula;
+import static note.noteFormula.SelectState.DEFAULT;
+import static note.noteFormula.SelectState.SELECTED;
 import note.notePtCurve;
 import note.notePtCurve.SelectState;
 import note.notePtCurveMgr;
@@ -100,7 +103,8 @@ public class noteSelectScenario extends XScenario {
             switch (code) {
                 case KeyEvent.VK_SHIFT:
                     this.dragPath.clear();
-                    if (note.getPtCurveMgr().getSelectedPtCurves().isEmpty()) {
+                    if (note.getPtCurveMgr().getSelectedPtCurves().isEmpty() &&
+                        note.getFormulaMgr().getSelectedFormulas_d().isEmpty()) {
                         XCmdToChangeScene.execute(note,
                             noteDefaultScenario.ReadyScene.getSingleton(),null);
                     } else {
@@ -183,6 +187,8 @@ public class noteSelectScenario extends XScenario {
             double maxY = boundingBox.getMaxY();
 
             note.getPenMarkMgr().startMark(new Point2D.Double(e.getX(), e.getY()));
+            ArrayList<notePtCurve> selectedCurves =
+                    note.getPtCurveMgr().getPtCurves();
             
             if (pt.x > maxX - HANDLE_RANGE && pt.x < maxX + HANDLE_RANGE &&
                 pt.y > maxY - HANDLE_RANGE && pt.y < maxY +HANDLE_RANGE) {
@@ -193,6 +199,16 @@ public class noteSelectScenario extends XScenario {
                 XCmdToChangeScene.execute(note,
                         noteObjectEditScenario.TranslateScene.getSingleton(), this);
             } else {
+                if (note.getPenMarkMgr().wasShortTab()) {
+                    for (notePtCurve ptCurve : selectedCurves) {
+                        ptCurve.setSelectState(SelectState.DEFAULT);
+                    }
+                    note.getPtCurveMgr().resetSelectedCurves();
+                    note.getCanvas2D().updateBoundingBox();
+                    note.getCanvas2D().repaint();
+                    XCmdToChangeScene.execute(note,
+                            noteDefaultScenario.ReadyScene.getSingleton(), null);
+            }
             }
         }
         
@@ -211,7 +227,9 @@ public class noteSelectScenario extends XScenario {
             int code = e.getKeyCode();
 
             ArrayList<notePtCurve> selectedCurves =
-                    note.getPtCurveMgr().getPtCurves();
+                    note.getPtCurveMgr().getSelectedPtCurves();
+            ArrayList<noteFormula> selectedMolecules =
+                    note.getFormulaMgr().getSelectedFormulas_d();
 
             switch (code) {
                 case KeyEvent.VK_ESCAPE:
@@ -219,6 +237,10 @@ public class noteSelectScenario extends XScenario {
                         ptCurve.setSelectState(SelectState.DEFAULT);
                     }
                     note.getPtCurveMgr().resetSelectedCurves();
+                    for (noteFormula molecule : selectedMolecules) {
+                        molecule.setSelectState(DEFAULT);
+                    note.getFormulaMgr().resetSelectedFormulas_d();
+                    }
                     note.getCanvas2D().updateBoundingBox();
                     note.getCanvas2D().repaint();
                     XCmdToChangeScene.execute(note,
@@ -236,6 +258,18 @@ public class noteSelectScenario extends XScenario {
                         curveMgr.removeCurve(ptCurve);
                     }
                     note.getPtCurveMgr().resetSelectedCurves();
+                    
+                    ArrayList<noteFormula> formulasToRemove = new ArrayList<>();
+                    for (noteFormula formula : selectedMolecules) {
+                        if (formula.getSelectState() == SELECTED) {
+                            formulasToRemove.add(formula);
+                        }
+                    }
+                    for (noteFormula formula : formulasToRemove) {
+                        note.getFormulaMgr().removeFormula(formula);
+                    }
+                    note.getFormulaMgr().resetSelectedFormulas_d();
+                    
                     note.getCanvas2D().updateBoundingBox();
                     note.getCanvas2D().repaint();
                     XCmdToChangeScene.execute(note,
