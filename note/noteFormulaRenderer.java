@@ -13,6 +13,7 @@ public class noteFormulaRenderer {
     public static final Color COLOR_FORMULA_TEMP = new Color(192, 192, 192, 192);
     public static final double LENGTH_EDGE_DEFAULT = 100.0;
     public static final float EDGE_STROKE_WIDTH = 4.0f;
+    public static final Font FONT_ATOM = new Font("Arial", Font.BOLD, 24);
 
     // Constructor
     public noteFormulaRenderer(noteApp note, noteCanvas2D canvas) {
@@ -74,8 +75,13 @@ public class noteFormulaRenderer {
         g2.setColor(Color.BLACK); // Atom 기본 색상
         Point2D.Double position = atom.getPosition();
 
-        // Atom 위치에 점 그리기
-        g2.fillOval((int) (position.x - 3), (int) (position.y - 3), 6, 6);
+        if (atom.getType() == "C") {
+            // Atom 위치에 점 그리기
+            g2.fillOval((int) (position.x - 3), (int) (position.y - 3), 6, 6);
+        } else {
+            g2.setFont(FONT_ATOM);
+            g2.drawString(atom.getType(), (float) position.x - 10, (float) position.y + 10);
+        }
 
         // 디버깅용 라벨 "A" 표시
         g2.setColor(Color.RED);
@@ -85,8 +91,8 @@ public class noteFormulaRenderer {
 
     // Edge 그리기
     private void renderEdges(Graphics2D g2, noteFormulaEdge edge) {
-        Point2D.Double start = edge.getStartAtom().getPosition();
-        Point2D.Double end = edge.getEndAtom().getPosition();
+        noteFormulaAtom start = edge.getStartAtom();
+        noteFormulaAtom end = edge.getEndAtom();
 
         // Edge 타입에 따른 렌더링 방식
         switch (edge.getClass().getSimpleName()) {
@@ -101,23 +107,61 @@ public class noteFormulaRenderer {
         // 디버깅용 라벨 "E" 표시
         g2.setColor(Color.RED);
         g2.setFont(new Font("Arial", Font.PLAIN, 12));
-        double midX = (start.x + end.x) / 2;
-        double midY = (start.y + end.y) / 2;
+        double midX = (start.getPosition().x + end.getPosition().x) / 2;
+        double midY = (start.getPosition().y + end.getPosition().y) / 2;
         g2.drawString("E", (float) midX + 5, (float) midY - 5);
     }
 
     // 단일 결합 Edge
-    private void drawEdgeSingle(Graphics2D g2, Point2D.Double start, Point2D.Double end) {
+    private void drawEdgeSingle(Graphics2D g2, noteFormulaAtom startAtom, noteFormulaAtom endAtom) {
+        Point2D.Double start;
+        Point2D.Double end;
+
+        if (startAtom.getType().equals("C")) {
+            // 탄소면 끝까지 선 그리기 
+            start = startAtom.getPosition();
+        } else {
+            // 아니라면 선 더 짧게 그리기 
+            start = shortenPosition(startAtom, endAtom, 20);
+        }
+
+        if (endAtom.getType().equals("C")) {
+            // 탄소면 끝까지 선 그리기 
+            end = endAtom.getPosition();
+        } else {
+            // 아니라면 선 더 짧게 그리기 
+            end = shortenPosition(endAtom, startAtom, 20);
+        }
+
         g2.setColor(COLOR_FORMULA_DEFAULT); // Edge 색상
         g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH)); // Edge 굵기
         g2.drawLine((int) start.x, (int) start.y, (int) end.x, (int) end.y);
     }
 
     // 이중 결합 Edge
-    private void drawEdgeDouble(Graphics2D g2, Point2D.Double start, Point2D.Double end) {
+    private void drawEdgeDouble(Graphics2D g2, noteFormulaAtom startAtom, noteFormulaAtom endAtom) {
+        Point2D.Double start;
+        Point2D.Double end;
+
+        if (startAtom.getType().equals("C")) {
+            // 탄소면 끝까지 선 그리기 
+            start = startAtom.getPosition();
+        } else {
+            // 아니라면 선 더 짧게 그리기 
+            start = shortenPosition(startAtom, endAtom, 20);
+        }
+
+        if (endAtom.getType().equals("C")) {
+            // 탄소면 끝까지 선 그리기 
+            end = endAtom.getPosition();
+        } else {
+            // 아니라면 선 더 짧게 그리기 
+            end = shortenPosition(endAtom, startAtom, 20);
+        }
+        
         g2.setColor(COLOR_FORMULA_DEFAULT); // Edge 색상
         g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH)); // Edge 굵기
-
+        
         // 수직 벡터 계산
         double dx = end.x - start.x;
         double dy = end.y - start.y;
@@ -137,10 +181,29 @@ public class noteFormulaRenderer {
     }
 
     // 삼중 결합 Edge
-    private void drawEdgeTriple(Graphics2D g2, Point2D.Double start, Point2D.Double end) {
+    private void drawEdgeTriple(Graphics2D g2, noteFormulaAtom startAtom, noteFormulaAtom endAtom) {
+        Point2D.Double start;
+        Point2D.Double end;
+
+        if (startAtom.getType().equals("C")) {
+            // 탄소면 끝까지 선 그리기 
+            start = startAtom.getPosition();
+        } else {
+            // 아니라면 선 더 짧게 그리기 
+            start = shortenPosition(startAtom, endAtom, 20);
+        }
+
+        if (endAtom.getType().equals("C")) {
+            // 탄소면 끝까지 선 그리기 
+            end = endAtom.getPosition();
+        } else {
+            // 아니라면 선 더 짧게 그리기 
+            end = shortenPosition(endAtom, startAtom, 20);
+        }
+        
         g2.setColor(COLOR_FORMULA_DEFAULT); // Edge 색상
         g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH)); // Edge 굵기
-
+        
         // 수직 벡터 계산
         double dx = end.x - start.x;
         double dy = end.y - start.y;
@@ -161,6 +224,26 @@ public class noteFormulaRenderer {
                 (int) (start.x + 2 * offsetX), (int) (start.y + 2 * offsetY),
                 (int) (end.x + 2 * offsetX), (int) (end.y + 2 * offsetY)
         );
+    }
+    
+    // 주어진 Atom의 위치를 기준으로 방향으로 길이를 줄이는 메서드
+    private Point2D.Double shortenPosition(noteFormulaAtom atom, noteFormulaAtom otherAtom, double length) {
+        Point2D.Double position = atom.getPosition();
+        Point2D.Double otherPosition = otherAtom.getPosition();
+
+        // 방향 벡터 계산
+        double dx = otherPosition.x - position.x;
+        double dy = otherPosition.y - position.y;
+        double currentLength = Math.sqrt(dx * dx + dy * dy);
+
+        // 방향 벡터 정규화
+        if (currentLength != 0) {
+            dx /= currentLength;
+            dy /= currentLength;
+        }
+
+        // 새로운 위치 계산
+        return new Point2D.Double(position.x + dx * length, position.y + dy * length);
     }
 
     // Temp 결합 Edge
