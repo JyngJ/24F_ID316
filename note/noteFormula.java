@@ -5,6 +5,24 @@ import java.util.ArrayList;
 
 public class noteFormula extends noteObject {
 
+    // for Select in DefaultScene
+    public enum SelectState {
+        DEFAULT,          // 일반
+        SELECTED,      // SelectScene에서 선택
+        ERASE_SELECTED // EraseScene에서 선택
+    }
+    
+    private SelectState selectState = SelectState.DEFAULT;
+
+    public SelectState getSelectState() {
+        return this.selectState;
+    }
+    public void setSelectState(SelectState state) {
+        this.selectState = state;
+    }
+    
+    /// enum 도입... 문제가 생길시 지움ㅜㅜ
+    
     // Atom과 Edge 리스트
     private ArrayList<noteFormulaAtom> mAtoms = new ArrayList<>();
     private ArrayList<noteFormulaEdge> mEdges = new ArrayList<>();

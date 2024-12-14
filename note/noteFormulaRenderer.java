@@ -46,7 +46,18 @@ public class noteFormulaRenderer {
     // Formula를 그리는 메서드
     public void renderFormula(Graphics2D g2, noteFormula formula) {
         boolean isEditing = (formula == this.mNote.getFormulaMgr().getEditingFormula());
-
+        
+        // Default에서 선택된 상태 표시
+        if (formula.getSelectState() == noteFormula.SelectState.SELECTED) {
+            g2.setColor(Color.ORANGE);
+            g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH + 4)); // 더 두껍게
+            for (noteFormulaEdge edge : formula.getEdges()) {
+                Point2D.Double start = edge.getStartAtom().getPosition();
+                Point2D.Double end = edge.getEndAtom().getPosition();
+                g2.drawLine((int) start.x, (int) start.y, (int) end.x, (int) end.y);
+            }
+        }
+        
         // 편집 중인 formula의 터치 영역을 먼저 그림
         if (isEditing) {
             g2.setColor(noteCanvas2D.COLOR_HIGHLIGHT);

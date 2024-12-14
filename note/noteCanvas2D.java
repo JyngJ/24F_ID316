@@ -13,6 +13,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 import note.noteBoundingBox;
+import note.noteFormula;
+import note.noteFormulaAtom;
 import note.notePtCurve;
 import note.notePtCurve.SelectState;
 import static note.notePtCurve.SelectState.DEFAULT;
@@ -205,8 +207,11 @@ public class noteCanvas2D extends JPanel {
             boundingBox = new noteBoundingBox();
         }
         ArrayList<notePtCurve> selectedCurves = new ArrayList<>();
+        ArrayList<noteFormula> selectedMolecules = new ArrayList<>();
         selectedCurves = this.mNote.getPtCurveMgr().getSelectedPtCurves();
-        if (!selectedCurves.isEmpty()) {
+        selectedMolecules = this.mNote.getFormulaMgr().getSelectedFormulas_d();
+        
+        if (!selectedCurves.isEmpty() || !selectedMolecules.isEmpty()) {
             // BoundingBox 계산
             double minX = Double.MAX_VALUE, maxX = Double.MIN_VALUE;
             double minY = Double.MAX_VALUE, maxY = Double.MIN_VALUE;
@@ -219,6 +224,15 @@ public class noteCanvas2D extends JPanel {
                     maxY = Math.max(maxY, pt.y);
                 }
             }
+            for (noteFormula molecule : selectedMolecules) {
+                for (noteFormulaAtom atom : molecule.getAtoms()) {
+                    Point2D.Double pt = atom.getPosition();
+                    minX = Math.min(minX, pt.x);
+                    maxX = Math.max(maxX, pt.x);
+                    minY = Math.min(minY, pt.y);
+                    maxY = Math.max(maxY, pt.y);
+                    }
+                }
             // BoundingBox 설정
             boundingBox.setBoundingBox(minX, minY, maxX, maxY);
             this.mNote.getBoundingBox().setBoundingBox(minX, minY, maxX, maxY);

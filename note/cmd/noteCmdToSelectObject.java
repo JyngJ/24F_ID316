@@ -4,6 +4,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import note.noteApp;
+import note.noteFormula;
+import note.noteFormulaAtom;
 import note.notePtCurve;
 import note.notePtCurve.SelectState;
 import x.XApp;
@@ -46,9 +48,23 @@ public class noteCmdToSelectObject extends XLoggableCmd {
                 note.getPtCurveMgr().getSelectedPtCurves().add(curve);
             }
         }
-
+        ArrayList<noteFormula> molecules = note.getFormulaMgr().getFormulas();
+        for (noteFormula molecule : molecules) {
+            boolean isInside = true;
+            for (noteFormulaAtom atom : molecule.getAtoms()) {
+                if (selectionPath.contains(atom.getPosition())) {
+                    //pass
+                } else {
+                    isInside = false;
+                }
+            if (isInside) {
+                molecule.setSelectState(noteFormula.SelectState.SELECTED);
+                note.getFormulaMgr().getSelectedFormulas_d().add(molecule);
+            }
+            }
+        }
         return true;
-    }
+        }
 
     @Override
     protected String createLog() {

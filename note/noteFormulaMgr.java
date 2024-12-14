@@ -15,6 +15,17 @@ public class noteFormulaMgr {
     // 현재 작업 중인 엣지와 아톰들을 추적하기 위한 리스트
     private ArrayList<noteFormulaEdge> mPrevEdges = null;
     private ArrayList<noteFormulaAtom> mPrevAtoms = null;
+    
+    // for Select
+    private ArrayList<noteFormula> mSelectedFormulas_d = new ArrayList<>();
+
+    public ArrayList<noteFormula> getSelectedFormulas_d() {
+        return this.mSelectedFormulas_d;
+    }
+    
+    public void resetSelectedFormulas_d() {
+        this.mSelectedFormulas_d = new ArrayList<>();
+    }
 
     public ArrayList<noteFormulaEdge> getPrevEdges() {
         return this.mPrevEdges;
