@@ -8,11 +8,13 @@ public class notePenMark {
     private ArrayList<Point2D.Double> mPoints;  // 펜의 모든 점들
     private long mStartTime;  // 시작 시간
     private long mEndTime;    // 종료 시간
+    private boolean isShown;  
 
     public notePenMark() {
         this.mPoints = new ArrayList<>();
         this.mStartTime = System.currentTimeMillis();
         this.mEndTime = 0;
+        this.isShown = false; // 기본값은 false
     }
 
     public void addPoint(Point2D.Double pt) {
@@ -55,5 +57,13 @@ public class notePenMark {
 
     public long getStartTime() {
         return mStartTime;
+    }
+
+    public boolean isShown() {
+        return isShown;
+    }
+
+    public void setShown(boolean shown) {
+        isShown = shown;
     }
 }

@@ -87,7 +87,7 @@ public class noteFormulaDrawScenario extends XScenario {
                         formulaMgr.setCurrAtom(atom);
                         formulaMgr.setCurrFormula(formula);
 
-                        noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("temp", point2D);
+                        noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("C", point2D);
                         formulaMgr.setAtomTemp(tempAtom);
                         noteFormulaEdgeTemp tempEdge = new noteFormulaEdgeTemp(atom, tempAtom);
                         formulaMgr.setEdgeTemp(tempEdge);
@@ -108,7 +108,7 @@ public class noteFormulaDrawScenario extends XScenario {
             formulaMgr.setCurrFormula(
                     formulaMgr.findFormulaForAtom(newAtom));
 
-            noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("temp", point2D);
+            noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("C", point2D);
             formulaMgr.setAtomTemp(tempAtom);
             noteFormulaEdgeTemp tempEdge = new noteFormulaEdgeTemp(newAtom, tempAtom);
             formulaMgr.setEdgeTemp(tempEdge);
@@ -437,6 +437,7 @@ public class noteFormulaDrawScenario extends XScenario {
 
             // 작업 상태 초기화
             formulaMgr.clearPrevElements();
+            
             formulaMgr.setCurrFormula(null);
             formulaMgr.setCurrAtom(null);
             formulaMgr.setAtomTemp(null);

@@ -20,7 +20,7 @@ import static note.notePtCurve.SelectState.ERASE_SELECTED;
 import static note.notePtCurve.SelectState.SELECTED;
 
 public class noteCanvas2D extends JPanel {
-    
+
     private static final Color COLOR_PT_CURVE_DEFAULT = new Color(0, 0, 0, 192);
 
     private static final Stroke STROKE_PT_CURVE_DEFAULT
@@ -65,8 +65,9 @@ public class noteCanvas2D extends JPanel {
     public Stroke getCurrStrokeForPtCurve() {
         return mCurrStrokeForPtCurve;
     }
-    
-    public noteBoundingBox boundingBox;
+
+
+    public noteBoundingBox boundingBox = new noteBoundingBox();
 
     private noteFormulaRenderer mRenderer;
 
@@ -95,6 +96,7 @@ public class noteCanvas2D extends JPanel {
         this.drawFormulas(g2);
         this.drawPtCurves(g2);
         this.drawCurrPtCurve(g2);
+        this.drawPenMarks(g2);
 
         // draw pen tip
         mNote.getColorChooser().drawCells(g2, this.getWidth(), this.getHeight());
@@ -123,65 +125,6 @@ public class noteCanvas2D extends JPanel {
         renderer.renderFormulas(this.mNote, g2);
     }
 
-//    private void drawFormula(Graphics2D g2, noteFormula formula) {
-//        // Edge
-//        for (noteFormulaEdge edge : formula.getEdges()) {
-//            this.drawEdge(g2, edge);
-//        }
-//        
-//        // Atom
-//        for (noteFormulaAtom atom : formula.getAtoms()) {
-//            this.drawAtom(g2, atom);
-//        }
-//    }
-//
-//    private void drawAtom(Graphics2D g2, noteFormulaAtom atom) {
-//        // Atom 위치
-//        Point2D.Double position = atom.getPosition();
-//
-//        // Atom 터치 영역(원)
-//        g2.setColor(Color.LIGHT_GRAY); // 터치 영역은 연한 회색
-//        g2.fillOval(
-//            (int) (position.x - ATOM_TOUCH_AREA_RADIUS / 2),
-//            (int) (position.y - ATOM_TOUCH_AREA_RADIUS / 2),
-//            (int) ATOM_TOUCH_AREA_RADIUS,
-//            (int) ATOM_TOUCH_AREA_RADIUS
-//        );
-//
-//        // Atom 중심 (실제 원)
-//        g2.setColor(Color.BLACK); // Atom 기본 색상
-//        g2.fillOval(
-//            (int) (position.x - ATOM_RADIUS),
-//            (int) (position.y - ATOM_RADIUS),
-//            (int) (ATOM_RADIUS * 2),
-//            (int) (ATOM_RADIUS * 2)
-//        );
-//
-//        // Atom 타입 (텍스트)
-//        g2.setFont(new Font("Monospaced", Font.PLAIN, 16));
-//        g2.setColor(Color.WHITE); // 텍스트 색상
-//        g2.drawString(
-//            atom.getType(),
-//            (int) (position.x - 5), // 텍스트 위치 약간 중앙으로 조정
-//            (int) (position.y + 5)
-//        );
-//    }
-//
-//    private void drawEdge(Graphics2D g2, noteFormulaEdge edge) {
-//        // Edge 시작점과 끝점
-//        Point2D.Double start = edge.getStartAtom().getPosition();
-//        Point2D.Double end = edge.getEndAtom().getPosition();
-//
-//        // Edge 라인 그리기
-//        g2.setColor(Color.BLACK); // Edge 색상
-//        g2.setStroke(STROKE_PT_CURVE_DEFAULT); // Edge 기본 Stroke
-//        g2.drawLine(
-//            (int) start.x,
-//            (int) start.y,
-//            (int) end.x,
-//            (int) end.y
-//        );
-//    }
     // Draw the in-progress curve
     private void drawCurrPtCurve(Graphics2D g2) {
         notePtCurve ptCurve = this.mNote.getPtCurveMgr().getCurrPtCurve();
@@ -253,7 +196,7 @@ public class noteCanvas2D extends JPanel {
         }
         g2.draw(path);
     }
-    
+
     // For Drawing BoundingBox
     
     public void updateBoundingBox() {
@@ -299,7 +242,7 @@ public class noteCanvas2D extends JPanel {
         boundingBox.setBoundingBox( -5, -5, -5, -5); // 화면 밖에 그려지도록
         repaint();  // 화면 새로 고침
     }
-    
+
 //    public void drawBoundingBoxForSelectedCurves(Graphics2D g2) {
 //        final int GAP = 5;
 //        ArrayList<notePtCurve> selectedCurves = new ArrayList<>();
@@ -333,7 +276,6 @@ public class noteCanvas2D extends JPanel {
 //            drawScaleHandles(g2, minX - GAP, minY - GAP, maxX + GAP, maxY + GAP);
 //        }
 //    }
-
     public void drawScaleHandles(Graphics2D g2, double minX, double minY, double maxX, double maxY) {
         final int HANDLE_SIZE = 5;
         g2.setColor(Color.ORANGE);
@@ -343,5 +285,24 @@ public class noteCanvas2D extends JPanel {
         g2.fill(new Ellipse2D.Double(minX - HANDLE_SIZE / 2, maxY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
         g2.fill(new Ellipse2D.Double(maxX - HANDLE_SIZE / 2, maxY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
     }
-    
+
+    private void drawPenMarks(Graphics2D g2) {
+        for (notePenMark penMark : this.mNote.getPenMarkMgr().getMarks()) {
+            if (!penMark.isShown()) {
+                break; // isShown이 false인 경우 그리지 않음
+            }
+
+            // PenMark의 점들을 그리는 로직 추가
+            ArrayList<Point2D.Double> points = penMark.getPoints();
+            if (points.size() < 2) {
+                continue; // 점이 2개 미만이면 그리지 않음
+            }
+
+            for (int i = 1; i < points.size(); i++) {
+                Point2D.Double p1 = points.get(i - 1);
+                Point2D.Double p2 = points.get(i);
+                g2.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
+            }
+        }
+    }
 }

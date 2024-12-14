@@ -19,9 +19,16 @@ public class noteFormulaMgr {
     public ArrayList<noteFormulaEdge> getPrevEdges() {
         return this.mPrevEdges;
     }
-
+    public void setPrevEdges(ArrayList<noteFormulaEdge> pv) {
+        this.mPrevEdges = pv;
+    }
+    
     public ArrayList<noteFormulaAtom> getPrevAtoms() {
         return this.mPrevAtoms;
+    }
+    
+    public void setPrevAtoms(ArrayList<noteFormulaAtom> at) {
+        this.mPrevAtoms = at;
     }
 
     public noteFormula getCurrFormula() {
@@ -187,6 +194,25 @@ public class noteFormulaMgr {
             }
         }
     }
+    
+    // Formula를 제거하는 메서드
+    public void removeFormula(noteFormula formula) {
+        // 삭제할 Atom과 Edge 수집
+        ArrayList<noteFormulaAtom> atomsToRemove = new ArrayList<>(formula.getAtoms());
+        ArrayList<noteFormulaEdge> edgesToRemove = new ArrayList<>(formula.getEdges());
+
+        // Atom과 Edge를 순차적으로 삭제
+        for (noteFormulaAtom a : atomsToRemove) {
+            removeAtom(a);
+        }
+        for (noteFormulaEdge e : edgesToRemove) {
+            removeEdge(e);
+        }
+
+        // Formula 리스트에서 제거
+        this.mFormulas.remove(formula);
+    }
+
 
     // Atom을 완전히 제거하는 메서드
     public void removeAtom(noteFormulaAtom atom) {
@@ -203,11 +229,38 @@ public class noteFormulaMgr {
             formula.getAtoms().remove(atom);
         }
     }
+    
+    // Atom을 완전히 제거하는 메서드
+    public void removeEdge(noteFormulaEdge edge) {
+        // prevAtoms에서 제거
+        this.mPrevEdges.remove(edge);
+
+        // 현재 Formula에서도 제거
+        if (this.mCurrFormula != null) {
+            this.mCurrFormula.getEdges().remove(edge);
+        }
+
+        // 모든 Formula에서 해당 atom 찾아서 제거
+        for (noteFormula formula : this.mFormulas) {
+            formula.getEdges().remove(edge);
+        }
+    }
+
+    
 
     public void translateSelectedFormula(double dx, double dy) {
         if (this.mSelectedFormula != null) {
             this.mSelectedFormula.translateTo(dx, dy);
         }
     }
+
+//    public noteFormulaEdge findIntersectingEdge(noteFormula formula, notePenMark penMark) {
+//        // Get the start and end points of the pen mark
+//        Point2D.Double start = penMark.getStartPoint();
+//        Point2D.Double end = penMark.getEndPoint();
+//
+//        
+//    }
+    
 
 }
