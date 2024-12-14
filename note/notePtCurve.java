@@ -77,4 +77,15 @@ public class notePtCurve extends noteObject {
             pt.setLocation(pt.x + dx, pt.y + dy);
         }
     }
+    
+    @Override
+    public void scaleTo(double scaleFactor, Point2D.Double topLeft) {
+        if (mPts.isEmpty()) return;
+        for (Point2D.Double pt : this.mPts) {
+            double newX = pt.x + (pt.x - topLeft.x) * (scaleFactor - 1);
+            double newY = pt.y + (pt.y - topLeft.y) * (scaleFactor - 1);
+            pt.setLocation(newX, newY);
+            System.out.println("sf = "+scaleFactor + ", tL = " + topLeft);
+        }
+    }
 }
