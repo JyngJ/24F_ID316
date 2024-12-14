@@ -10,107 +10,88 @@ public class noteFormulaMgr {
     public static final long LONG_PRESS_DURATION = 500; // 0.5초 (밀리초)
 
     // fields
-    // 현재 작업 중인 엣지와 아톰들을 추적하기 위한 리스트
+    
     private ArrayList<noteFormulaEdge> mPrevEdges = null;
-    private ArrayList<noteFormulaAtom> mPrevAtoms = null;
-
     public ArrayList<noteFormulaEdge> getPrevEdges() {
         return this.mPrevEdges;
     }
-
     public void setPrevEdges(ArrayList<noteFormulaEdge> pv) {
         this.mPrevEdges = pv;
     }
 
+    private ArrayList<noteFormulaAtom> mPrevAtoms = null;
     public ArrayList<noteFormulaAtom> getPrevAtoms() {
         return this.mPrevAtoms;
     }
-
     public void setPrevAtoms(ArrayList<noteFormulaAtom> at) {
         this.mPrevAtoms = at;
     }
 
     private noteFormula mCurrFormula = null;
-
     public noteFormula getCurrFormula() {
         return this.mCurrFormula;
     }
-
     public void setCurrFormula(noteFormula formula) {
         this.mCurrFormula = formula;
     }
 
     private noteFormulaAtomTemp mTempAtom = null;
-
     public noteFormulaAtomTemp getAtopTemp() {
         return this.mTempAtom;
     }
-
     public void setAtomTemp(noteFormulaAtomTemp tempAtom) {
         this.mTempAtom = tempAtom;
     }
 
     private noteFormulaEdgeTemp mTempEdge = null;
-
     public noteFormulaEdgeTemp getEdgeTemp() {
         return this.mTempEdge;
     }
-
     public void setEdgeTemp(noteFormulaEdgeTemp tempEdge) {
         this.mTempEdge = tempEdge;
     }
 
     // 현재 엣지가 시작되고 있는 atom
     private noteFormulaAtom mCurrAtom = null;
-
     public noteFormulaAtom getCurrAtom() {
         return this.mCurrAtom;
     }
-
     public void setCurrAtom(noteFormulaAtom atom) {
         this.mCurrAtom = atom;
     }
 
     private ArrayList<noteFormula> mFormulas = null;
-
     public ArrayList<noteFormula> getFormulas() {
         return this.mFormulas;
     }
 
     private noteFormula mSelectedFormula = null;
-
     public noteFormula getSelectedFormula() {
         return this.mSelectedFormula;
     }
 
     private noteFormula mEditingFormula = null;
-
     public noteFormula getEditingFormula() {
         return this.mEditingFormula;
     }
-
     public void setEditingFormula(noteFormula formula) {
         this.mEditingFormula = formula;
     }
 
     // 원자 수정시 대상이 되는 원자 
     private noteFormulaAtom mEditingAtom = null;
-
     public noteFormulaAtom getEditingAtom() {
         return this.mEditingAtom;
     }
-
     public void setEditingAtom(noteFormulaAtom atom) {
         this.mEditingAtom = atom;
     }
 
     // 엣지 수정시 대상이 되는 엣지 
     private noteFormulaEdge mEditingEdge = null;
-
     public noteFormulaEdge getEditingEdge() {
         return this.mEditingEdge;
     }
-
     public void setEditingEdge(noteFormulaEdge edge) {
         this.mEditingEdge = edge;
     }
@@ -122,6 +103,7 @@ public class noteFormulaMgr {
         this.mPrevAtoms = new ArrayList<>();
     }
 
+    // 메서드 
     // 현재 작업 중인 엣지/아톰 추가
     public void addPrevEdge(noteFormulaEdge edge) {
         this.mPrevEdges.add(edge);
@@ -137,7 +119,6 @@ public class noteFormulaMgr {
         this.mPrevAtoms.clear();
     }
 
-    // 메서드 
     // 특정 Atom이 속한 Formula를 찾는 메서드
     public noteFormula findFormulaFor(noteFormulaAtom atom) {
         for (noteFormula formula : mFormulas) {
@@ -158,6 +139,7 @@ public class noteFormulaMgr {
         return null; //어떤 Formula에도 속하지 않을 경우 null 반환
     }
 
+    // 현재 존재하는 formula들의 validity 확인 
     public void arrangeFormulas() {
         for (noteFormula formula : this.mFormulas) {
             ArrayList<noteFormulaEdge> edges = (ArrayList<noteFormulaEdge>) formula.getEdges();
@@ -209,6 +191,7 @@ public class noteFormulaMgr {
 
     }
 
+    // 같은 원소인지 확인 
     private boolean hasSameAtoms(noteFormulaEdge edge1, noteFormulaEdge edge2) {
         return (edge1.getStartAtom() == edge2.getStartAtom()
                 && edge1.getEndAtom() == edge2.getEndAtom())
@@ -216,12 +199,14 @@ public class noteFormulaMgr {
                 && edge1.getEndAtom() == edge2.getStartAtom());
     }
 
+    // 같은 위치인지 확인
     private boolean isSamePosition(noteFormulaAtom atom1, noteFormulaAtom atom2) {
         Point2D.Double pos1 = atom1.getPosition();
         Point2D.Double pos2 = atom2.getPosition();
         return pos1.distance(pos2) < 1.0; // 1픽셀 이내면 같은 위치로 간주
     }
-
+    
+    // 엣지를 바꿔서 연결
     private void redirectEdges(ArrayList<noteFormulaEdge> edges,
             noteFormulaAtom oldAtom, noteFormulaAtom newAtom) {
         for (noteFormulaEdge edge : edges) {
