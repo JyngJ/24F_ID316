@@ -98,7 +98,15 @@ public class noteFormula extends noteObject {
     }
 
     @Override
-    public void scaleTo(double sf, Point2D.Double topLeft) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void scaleTo(double scaleFactor, Point2D.Double topLeft) {
+        if (mAtoms.isEmpty()) {
+            return;
+        }
+        for (noteFormulaAtom atom : this.mAtoms) {
+            Point2D.Double pos = atom.getPosition();
+            double newX = topLeft.x + (pos.x - topLeft.x) * scaleFactor;
+            double newY = topLeft.y + (pos.y - topLeft.y) * scaleFactor;
+            atom.setPosition(new Point2D.Double(newX, newY));
+        }
     }
 }

@@ -101,7 +101,7 @@ public class noteDefaultScenario extends XScenario {
                         // Formula를 편집 모드로 설정하고 Edit 씬으로 전환
                         note.getFormulaMgr().setEditingFormula(formula);
                         XCmdToChangeScene.execute(note,
-                                noteFormulaEditScenario.noteFormulaEditReadyScene.getSingleton(), this);
+                                noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), this);
                         return;
                     }
                 }

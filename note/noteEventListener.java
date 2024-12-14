@@ -19,7 +19,7 @@ public class noteEventListener implements MouseListener, MouseMotionListener,
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {        
+    public void mousePressed(MouseEvent e) {
         // 펜 마크 시작
         Point2D.Double pt = new Point2D.Double(e.getX(), e.getY());
         mNote.getPenMarkMgr().startMark(pt);
@@ -40,6 +40,7 @@ public class noteEventListener implements MouseListener, MouseMotionListener,
         noteScene currScene = (noteScene) this.mNote.getScenarioMgr().getCurrScene();
         currScene.handleMouseDrag(e);
         this.mNote.getCanvas2D().repaint();
+
     }
 
     @Override

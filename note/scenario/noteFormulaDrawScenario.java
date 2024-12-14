@@ -46,11 +46,11 @@ public class noteFormulaDrawScenario extends XScenario {
     @Override
     protected void addScenes() {
         this.addScene(noteFormulaDrawScenario.FormulaReadyScene.createSingleton(this));
+        this.addScene(noteFormulaDrawScenario.FormulaAppendReadyScene.createSingleton(this));
         this.addScene(noteFormulaDrawScenario.FormulaDrawScene.createSingleton(this));
     }
 
     public static class FormulaReadyScene extends noteScene {
-
         // singleton pattern
         private static FormulaReadyScene mSingleton = null;
 
@@ -75,7 +75,7 @@ public class noteFormulaDrawScenario extends XScenario {
             noteFormulaMgr formulaMgr = note.getFormulaMgr();
 
             // 클릭 위치 가져오기
-            Point pt = e.getPoint(); // MouseEvent���������서 가져온 Point
+            Point pt = e.getPoint();
             Point2D.Double point2D
                     = new Point2D.Double(pt.x, pt.y);    //실수형으로 변환 
 
@@ -106,7 +106,7 @@ public class noteFormulaDrawScenario extends XScenario {
 
             formulaMgr.setCurrAtom(newAtom);
             formulaMgr.setCurrFormula(
-                    formulaMgr.findFormulaForAtom(newAtom));
+                    formulaMgr.findFormulaFor(newAtom));
 
             noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("C", point2D);
             formulaMgr.setAtomTemp(tempAtom);
@@ -140,6 +140,112 @@ public class noteFormulaDrawScenario extends XScenario {
             int code = e.getKeyCode();
             switch (code) {
                 case KeyEvent.VK_F:             // will be changed
+                    XCmdToChangeScene.execute(note,
+                            mReturnScene, null);
+                    break;
+            }
+        }
+
+        @Override
+        public void updateSupportObjects() {
+
+        }
+
+        @Override
+        public void renderWorldObjects(Graphics2D g2) {
+
+        }
+
+        @Override
+        public void renderScreenObjects(Graphics2D g2) {
+
+        }
+
+        @Override
+        public void getReady() {
+
+        }
+
+        @Override
+        public void wrapUp() {
+
+        }
+    }
+    
+    public static class FormulaAppendReadyScene extends noteScene {
+
+        // singleton pattern
+        private static FormulaAppendReadyScene mSingleton = null;
+
+        public static FormulaAppendReadyScene getSingleton() {
+            assert (FormulaAppendReadyScene.mSingleton != null);
+            return FormulaAppendReadyScene.mSingleton;
+        }
+
+        public static FormulaAppendReadyScene createSingleton(XScenario scenario) {
+            assert (FormulaAppendReadyScene.mSingleton == null);
+            FormulaAppendReadyScene.mSingleton = new FormulaAppendReadyScene(scenario);
+            return FormulaAppendReadyScene.mSingleton;
+        }
+
+        private FormulaAppendReadyScene(XScenario scenario) {
+            super(scenario);
+        }
+
+        @Override
+        public void handleMousePress(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            noteFormulaMgr formulaMgr = note.getFormulaMgr();
+
+            // 클릭 위치 가져오기
+            Point pt = e.getPoint();
+            Point2D.Double point2D
+                    = new Point2D.Double(pt.x, pt.y);
+
+            // Formula 리스트에서 클릭 위치가 Atom의 터치 영역에 있는지 확인
+            for (noteFormula formula : formulaMgr.getFormulas()) {
+                for (noteFormulaAtom atom : formula.getAtoms()) {
+                    if (atom.getTouchArea().contains(pt)) {
+                        // 클릭 위치가 Atom의 터치 영역 안에 있음
+                        formulaMgr.setCurrAtom(atom);
+                        formulaMgr.setCurrFormula(formula);
+
+                        noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("C", point2D);
+                        formulaMgr.setAtomTemp(tempAtom);
+                        noteFormulaEdgeTemp tempEdge = new noteFormulaEdgeTemp(atom, tempAtom);
+                        formulaMgr.setEdgeTemp(tempEdge);
+
+                        // 씬 전환
+                        XCmdToChangeScene.execute(note,
+                                noteFormulaDrawScenario.FormulaDrawScene.getSingleton(),
+                                this.mReturnScene);
+                        return;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void handleMouseDrag(MouseEvent e) {
+
+        }
+
+        @Override
+        public void handleMouseRelease(MouseEvent e) {
+
+        }
+
+        @Override
+        public void handleKeyDown(KeyEvent e) {
+
+        }
+
+        @Override
+        public void handleKeyUp(KeyEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            int code = e.getKeyCode();
+            switch (code) {
+                case KeyEvent.VK_F:
                     XCmdToChangeScene.execute(note,
                             mReturnScene, null);
                     break;
@@ -244,7 +350,7 @@ public class noteFormulaDrawScenario extends XScenario {
                     double distance = Math.sqrt(dx * dx + dy * dy);
 
                     // 거리가 충분할 경우 새 Atom과 Edge 생성
-                    if (distance >= noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 2) {
+                    if (distance >= 4 * noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 5) {
                         // AtomTemp 위치에 새 Atom 생성
                         Point2D.Double tempPos = formulaMgr.getAtopTemp().getPosition();
                         noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, tempPos);
@@ -275,7 +381,7 @@ public class noteFormulaDrawScenario extends XScenario {
                             double dy = currentPoint.y - startPos.y;
                             double distance = Math.sqrt(dx * dx + dy * dy);
 
-                            if (distance >= noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 3) {
+                            if (distance >= 2 * noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 3) {
                                 // 이전 상태로 복원
                                 noteFormulaAtom prevAtom = lastPrevEdge.getStartAtom();
 
@@ -344,7 +450,7 @@ public class noteFormulaDrawScenario extends XScenario {
                         formulaMgr.addPrevEdge(newEdge);
 
                         // Formula에 Edge 추가
-                        noteFormula sourceFormula = formulaMgr.findFormulaForAtom(currAtom);
+                        noteFormula sourceFormula = formulaMgr.findFormulaFor(currAtom);
                         sourceFormula.addEdge(newEdge);
 
                         // Formula 병합
