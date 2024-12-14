@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Stroke;
+import java.awt.geom.Point2D;
 
 public class noteBoundingBox extends noteObject {
     private double minX, minY, maxX, maxY;
@@ -45,6 +46,14 @@ public class noteBoundingBox extends noteObject {
     public double getMaxY() {
         return this.maxY;
     }
+    
+    public double getWidth() {
+        return this.maxX - this.minX;
+    }
+    
+    public double getHeight() {
+        return this.maxY - this.minY;
+    }
 
     @Override
     public void translateTo(double dx, double dy) {
@@ -53,5 +62,10 @@ public class noteBoundingBox extends noteObject {
         this.getMinY() + dy,
         this.getMaxX() + dx,
         this.getMaxY() + dy);
+    }
+
+    @Override
+    public void scaleTo(double sf, Point2D.Double topLeft) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
