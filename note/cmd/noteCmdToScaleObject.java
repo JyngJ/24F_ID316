@@ -42,18 +42,18 @@ public class noteCmdToScaleObject extends XLoggableCmd {
         if (this.dx > 0) {
             if (this.dy > 0) {
                 // Both dx and dy are positive, use the smaller relative change
-                this.scaleFactor = 1 + Math.min(this.dx / width, this.dy / height);
+                this.scaleFactor = 1 + Math.min(this.dx / (width + this.dx), this.dy / (height + this.dy));
             } else {
                 // Only dx is positive, scale based on dx
-                this.scaleFactor = 1 + (this.dx / width);
+                this.scaleFactor = 1 + (this.dx / (width + this.dx));
             }
         } else {
             if (this.dy > 0) {
                 // Only dy is positive, scale based on dy
-                this.scaleFactor = 1 + (this.dy / height);
+                this.scaleFactor = 1 + (this.dy / (height + this.dx));
             } else {
                 // Both dx and dy are negative, use the smaller relative change
-                this.scaleFactor = 1 + Math.min(this.dx / width, this.dy / height);
+                this.scaleFactor = 1 + Math.min(this.dx / (width + this.dx), this.dy / (height+ this.dy));
             }
         }
 
