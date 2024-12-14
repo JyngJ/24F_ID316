@@ -176,28 +176,32 @@ public class noteSelectScenario extends XScenario {
             noteApp note = (noteApp) this.mScenario.getApp();
             noteBoundingBox boundingBox = note.getBoundingBox();
             Point pt = e.getPoint();
+            int HANDLE_RANGE = 10;
             double minX = boundingBox.getMinX();
             double minY = boundingBox.getMinY();
             double maxX = boundingBox.getMaxX();
             double maxY = boundingBox.getMaxY();
 
+            note.getPenMarkMgr().startMark(new Point2D.Double(e.getX(), e.getY()));
+            
+            if (pt.x > maxX - HANDLE_RANGE && pt.x < maxX + HANDLE_RANGE &&
+                pt.y > maxY - HANDLE_RANGE && pt.y < maxY +HANDLE_RANGE) {
+                XCmdToChangeScene.execute(note,
+                        noteObjectEditScenario.ScaleScene.getSingleton(), this);
+            }
             if (pt.x > minX && pt.x < maxX && pt.y > minY && pt.y < maxY) {
                 XCmdToChangeScene.execute(note,
                         noteObjectEditScenario.TranslateScene.getSingleton(), this);
             } else {
-                XCmdToChangeScene.execute(note,
-                        noteObjectEditScenario.ScaleScene.getSingleton(), this);
             }
         }
         
         @Override
         public void handleMouseDrag(MouseEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         }
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         }
 
         @Override

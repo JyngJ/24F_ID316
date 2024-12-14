@@ -66,6 +66,7 @@ public class noteCanvas2D extends JPanel {
 
 
     public noteBoundingBox boundingBox = new noteBoundingBox();
+    private Color ScaleHandleColor = Color.ORANGE;
 
     private noteFormulaRenderer mRenderer;
 
@@ -241,47 +242,19 @@ public class noteCanvas2D extends JPanel {
         repaint();  // 화면 새로 고침
     }
 
-//    public void drawBoundingBoxForSelectedCurves(Graphics2D g2) {
-//        final int GAP = 5;
-//        ArrayList<notePtCurve> selectedCurves = new ArrayList<>();
-//        for (notePtCurve ptCurve : this.mNote.getPtCurveMgr().getPtCurves()) {
-//            if (ptCurve.getSelectState() == SelectState.SELECTED) {
-//                selectedCurves.add(ptCurve);
-//            }
-//        }
-//
-//        if (!selectedCurves.isEmpty()) {
-//            // BoundingBox 계산
-//            double minX = Double.MAX_VALUE, maxX = Double.MIN_VALUE;
-//            double minY = Double.MAX_VALUE, maxY = Double.MIN_VALUE;
-//
-//            for (notePtCurve curve : selectedCurves) {
-//                for (Point2D.Double pt : curve.getPts()) {
-//                    minX = Math.min(minX, pt.x);
-//                    maxX = Math.max(maxX, pt.x);
-//                    minY = Math.min(minY, pt.y);
-//                    maxY = Math.max(maxY, pt.y);
-//                }
-//            }
-//
-//            // BoundingBox 그리기
-//            g2.setColor(Color.ORANGE);
-//            g2.setStroke(DASHED_STROKE);
-//            g2.drawRect((int) minX - GAP, (int) minY - GAP,
-//                (int) (maxX - minX + 2 * GAP), (int) (maxY - minY) + 2 * GAP);
-//            
-//            // ScaleHandle 그리기
-//            drawScaleHandles(g2, minX - GAP, minY - GAP, maxX + GAP, maxY + GAP);
-//        }
-//    }
     public void drawScaleHandles(Graphics2D g2, double minX, double minY, double maxX, double maxY) {
-        final int HANDLE_SIZE = 5;
+        final int HANDLE_SIZE = 6;
         g2.setColor(Color.ORANGE);
         // BoundingBox 네 꼭짓점에 동그라미
-        g2.fill(new Ellipse2D.Double(minX - HANDLE_SIZE / 2, minY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
-        g2.fill(new Ellipse2D.Double(maxX - HANDLE_SIZE / 2, minY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
-        g2.fill(new Ellipse2D.Double(minX - HANDLE_SIZE / 2, maxY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
-        g2.fill(new Ellipse2D.Double(maxX - HANDLE_SIZE / 2, maxY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
+        g2.fill(new Ellipse2D.Double(minX - HANDLE_SIZE / 2,
+            minY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
+        g2.fill(new Ellipse2D.Double(maxX - HANDLE_SIZE / 2,
+            minY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
+        g2.fill(new Ellipse2D.Double(minX - HANDLE_SIZE / 2,
+            maxY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
+        g2.setColor(ScaleHandleColor);
+        g2.fill(new Ellipse2D.Double(maxX - HANDLE_SIZE / 2,
+            maxY - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE));
     }
 
     private void drawPenMarks(Graphics2D g2) {

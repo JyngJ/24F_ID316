@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import note.cmd.noteCmdToScaleObject;
 import note.noteApp;
 import note.noteObject;
 import note.notePenMarkMgr;
@@ -94,8 +95,8 @@ public class noteObjectEditScenario extends XScenario {
             noteApp note = (noteApp) this.mScenario.getApp();
             prevPt = null;
             // End the pen mark
-            note.getPenMarkMgr().endMark();
-            System.out.println("Mouse Released. Pen mark ended.");
+//            note.getPenMarkMgr().endMark();
+//            System.out.println("Mouse Released. Pen mark ended.");
             XCmdToChangeScene.execute(note,
                         noteSelectScenario.SelectedScene.getSingleton(), null);
         }
@@ -129,14 +130,6 @@ public class noteObjectEditScenario extends XScenario {
 
         @Override
         public void getReady() {
-            noteApp note = (noteApp) this.mScenario.getApp();
-
-            // Debugging: Pen mark 상태 확인
-            if (note.getPenMarkMgr().isDragging()) {
-                System.out.println("TranslateScene: Pen mark already in progress.");
-            } else {
-                System.out.println("TranslateScene: No pen mark detected.");
-            }
         }
 
         @Override
@@ -145,7 +138,11 @@ public class noteObjectEditScenario extends XScenario {
         }
     }
     
+    /////////////////////////////////////////////////////////
+    
     public static class ScaleScene extends noteScene {
+        private Point2D.Double prevPt = null;
+        
         // singleton pattern
         private static ScaleScene mSingleton = null;
         public static ScaleScene getSingleton() {
@@ -168,12 +165,31 @@ public class noteObjectEditScenario extends XScenario {
 
         @Override
         public void handleMouseDrag(MouseEvent e) {
-        
+            noteApp note = (noteApp) this.mScenario.getApp();
+            Point2D.Double currPt = new Point2D.Double(e.getX(), e.getY());
+//            if (this.prevPt == null) {
+//                this.prevPt = currPt;
+//            }
+            double dx = currPt.x - this.prevPt.x;
+            double dy = currPt.y - this.prevPt.y;
+            if (note.getBoundingBox().getWidth() >= 20 &&
+                note.getBoundingBox().getHeight() >= 20) {
+                noteCmdToScaleObject.execute(note, dx, dy);
+            } else {
+                if (dx > 0 ){
+                noteCmdToScaleObject.execute(note, dx, dy);
+            }
+            }
+            this.prevPt = currPt;
+            System.out.println(dx+", "+dy+", and prevPt is "+ prevPt);
         }
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
-        
+            noteApp note = (noteApp) this.mScenario.getApp();
+            prevPt = null;
+            XCmdToChangeScene.execute(note,
+                        noteSelectScenario.SelectedScene.getSingleton(), null);
         }
 
         @Override
@@ -198,12 +214,20 @@ public class noteObjectEditScenario extends XScenario {
 
         @Override
         public void renderScreenObjects(Graphics2D g2) {
-        
+            noteApp note = (noteApp) this.mScenario.getApp();
+            note.getCanvas2D().drawBoundingBox(g2);
+            note.getCanvas2D().repaint();
         }
 
         @Override
         public void getReady() {
-        
+        noteApp note = (noteApp) this.mScenario.getApp();
+        if (note.getPenMarkMgr().getCurrPenMark() != null) {
+            this.prevPt = note.getPenMarkMgr().getCurrPenMark().getStartPoint();
+            System.out.println("Set prev Pt: " +this.prevPt);
+        } else {
+            System.out.println("tlqkf");
+        }
         }
 
         @Override
