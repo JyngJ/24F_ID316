@@ -167,12 +167,11 @@ public class noteFormulaMgr {
             edges.removeIf(edge -> {
                 return edge.getStartAtom() == null || edge.getEndAtom() == null;
             });
-            
+
 //            // 2. atom 혼자 있는 경우 제거 
 //            if (formula.getEdges().isEmpty()) {
 //                removeFormula(formula);
 //            }
-
             // 3. 중복 edge 제거 (같은 atom 쌍을 연결하는 edge)
             for (int i = edges.size() - 1; i >= 0; i--) {
                 noteFormulaEdge edge1 = edges.get(i);
@@ -205,7 +204,7 @@ public class noteFormulaMgr {
                     }
                 }
             }
-            
+
         }
 
     }
@@ -291,11 +290,45 @@ public class noteFormulaMgr {
         }
     }
 
-//    public noteFormulaEdge findIntersectingEdge(noteFormula formula, notePenMark penMark) {
-//        // Get the start and end points of the pen mark
-//        Point2D.Double start = penMark.getStartPoint();
-//        Point2D.Double end = penMark.getEndPoint();
-//
-//        
-//    }
+    public ArrayList<noteFormulaEdge> findIntersectingEdge(noteFormula formula, notePenMark penMark) {
+        ArrayList<noteFormulaEdge> intersectingEdges = new ArrayList<noteFormulaEdge>();
+
+        // PenMark의 시작점과 끝점 가져오기
+        Point2D.Double start = penMark.getStartPoint();
+        Point2D.Double end = penMark.getEndPoint();
+
+        // Formula의 모든 엣지를 순회
+        for (noteFormulaEdge edge : formula.getEdges()) {
+            // 엣지의 시작점과 끝점 가져오기
+            Point2D.Double edgeStart = edge.getStartAtom().getPosition();
+            Point2D.Double edgeEnd = edge.getEndAtom().getPosition();
+
+            // 엣지와 PenMark가 겹치는지 확인
+            if (isIntersecting(start, end, edgeStart, edgeEnd)) {
+                intersectingEdges.add(edge);
+            }
+        }
+
+        return intersectingEdges;
+    }
+
+    // 두 선분이 겹치는지 확인하는 메서드
+    private boolean isIntersecting(Point2D.Double start1, Point2D.Double end1, Point2D.Double start2, Point2D.Double end2) {
+        // d1: (start1->end1) 벡터와 (start1->start2) 벡터의 크로스 프로덕트 부호
+        double d1 = (end1.x - start1.x) * (start2.y - start1.y) - (end1.y - start1.y) * (start2.x - start1.x);
+        // d2: (start1->end1) 벡터와 (start1->end2) 벡터의 크로스 프로덕트 부호
+        double d2 = (end1.x - start1.x) * (end2.y - start1.y) - (end1.y - start1.y) * (end2.x - start1.x);
+        // d3: (start2->end2) 벡터와 (start2->start1) 벡터의 크로스 프로덕트 부호
+        double d3 = (end2.x - start2.x) * (start1.y - start2.y) - (end2.y - start2.y) * (start1.x - start2.x);
+        // d4: (start2->end2) 벡터와 (start2->end1) 벡터의 크로스 프로덕트 부호
+        double d4 = (end2.x - start2.x) * (end1.y - start2.y) - (end2.y - start2.y) * (end1.x - start2.x);
+
+        // 두 선분이 서로 다른 방향에 존재해야 교차
+        if (d1 * d2 < 0 && d3 * d4 < 0) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

@@ -6,11 +6,11 @@ import java.util.ArrayList;
 public class notePenMarkMgr {
 
     private static final int MAX_MARKS = 5;  // 최대 기록 수
-    public static final long SHORT_TAB_DURATION = 100; // 0.5초 (밀리초)
-    public static final long LONG_PRESS_DURATION = 500; // 0.5초 (밀리초)
+    public static final long SHORT_TAB_DURATION = 100; // 0.1초 (밀리초)
+    public static final long LONG_PRESS_DURATION = 300; // 0.3초 (밀리초)
     
     // 허용 오차 상수 (직선 판단 기준)
-    private static final double STRAIGHT_LINE_MAX_DEVIATION = 5;
+    private static final double STRAIGHT_LINE_MAX_DEVIATION = 10;
     
     private ArrayList<notePenMark> mMarks;   // 최근 펜 마크들
     // 마크 목록 가져오기
@@ -21,6 +21,10 @@ public class notePenMarkMgr {
     private notePenMark mCurrPenMark;          // 현재 진행 중인 펜 마크
     public notePenMark getCurrPenMark() {
         return mCurrPenMark;
+    }
+    
+    public notePenMark getLastPenMark() {
+        return mMarks.getLast();
     }
 
     public notePenMarkMgr() {
