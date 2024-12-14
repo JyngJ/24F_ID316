@@ -17,82 +17,100 @@ public class noteFormulaMgr {
     public ArrayList<noteFormulaEdge> getPrevEdges() {
         return this.mPrevEdges;
     }
+
     public void setPrevEdges(ArrayList<noteFormulaEdge> pv) {
         this.mPrevEdges = pv;
     }
-    
+
     public ArrayList<noteFormulaAtom> getPrevAtoms() {
         return this.mPrevAtoms;
     }
+
     public void setPrevAtoms(ArrayList<noteFormulaAtom> at) {
         this.mPrevAtoms = at;
     }
 
     private noteFormula mCurrFormula = null;
+
     public noteFormula getCurrFormula() {
         return this.mCurrFormula;
     }
+
     public void setCurrFormula(noteFormula formula) {
         this.mCurrFormula = formula;
     }
 
     private noteFormulaAtomTemp mTempAtom = null;
+
     public noteFormulaAtomTemp getAtopTemp() {
         return this.mTempAtom;
     }
+
     public void setAtomTemp(noteFormulaAtomTemp tempAtom) {
         this.mTempAtom = tempAtom;
     }
 
     private noteFormulaEdgeTemp mTempEdge = null;
+
     public noteFormulaEdgeTemp getEdgeTemp() {
         return this.mTempEdge;
     }
+
     public void setEdgeTemp(noteFormulaEdgeTemp tempEdge) {
         this.mTempEdge = tempEdge;
     }
 
     // 현재 엣지가 시작되고 있는 atom
     private noteFormulaAtom mCurrAtom = null;
+
     public noteFormulaAtom getCurrAtom() {
         return this.mCurrAtom;
     }
+
     public void setCurrAtom(noteFormulaAtom atom) {
         this.mCurrAtom = atom;
     }
 
     private ArrayList<noteFormula> mFormulas = null;
+
     public ArrayList<noteFormula> getFormulas() {
         return this.mFormulas;
     }
 
     private noteFormula mSelectedFormula = null;
+
     public noteFormula getSelectedFormula() {
         return this.mSelectedFormula;
     }
 
     private noteFormula mEditingFormula = null;
+
     public noteFormula getEditingFormula() {
         return this.mEditingFormula;
     }
+
     public void setEditingFormula(noteFormula formula) {
         this.mEditingFormula = formula;
     }
-    
+
     // 원자 수정시 대상이 되는 원자 
     private noteFormulaAtom mEditingAtom = null;
+
     public noteFormulaAtom getEditingAtom() {
         return this.mEditingAtom;
     }
+
     public void setEditingAtom(noteFormulaAtom atom) {
         this.mEditingAtom = atom;
     }
-    
+
     // 엣지 수정시 대상이 되는 엣지 
     private noteFormulaEdge mEditingEdge = null;
+
     public noteFormulaEdge getEditingEdge() {
         return this.mEditingEdge;
     }
+
     public void setEditingEdge(noteFormulaEdge edge) {
         this.mEditingEdge = edge;
     }
@@ -129,7 +147,7 @@ public class noteFormulaMgr {
         }
         return null; // Atom이 어떤 Formula에도 속하지 않을 경우 null 반환
     }
-    
+
     // 특정 Edge가 속한 Formula를 찾는 메서드
     public noteFormula findFormulaFor(noteFormulaEdge edge) {
         for (noteFormula formula : mFormulas) {
@@ -145,12 +163,17 @@ public class noteFormulaMgr {
             ArrayList<noteFormulaEdge> edges = (ArrayList<noteFormulaEdge>) formula.getEdges();
             ArrayList<noteFormulaAtom> atoms = (ArrayList<noteFormulaAtom>) formula.getAtoms();
 
-            // 1. 따로 있는 atom 제거 (edge가 없는 atom)
+            // 1. 따로 있는 Edge 제거 (atom 없는 edge)
             edges.removeIf(edge -> {
                 return edge.getStartAtom() == null || edge.getEndAtom() == null;
             });
+            
+//            // 2. atom 혼자 있는 경우 제거 
+//            if (formula.getEdges().isEmpty()) {
+//                removeFormula(formula);
+//            }
 
-            // 2. 중복 edge 제거 (같은 atom 쌍을 연결하는 edge)
+            // 3. 중복 edge 제거 (같은 atom 쌍을 연결하는 edge)
             for (int i = edges.size() - 1; i >= 0; i--) {
                 noteFormulaEdge edge1 = edges.get(i);
                 for (int j = i - 1; j >= 0; j--) {
@@ -162,14 +185,14 @@ public class noteFormulaMgr {
                 }
             }
 
-            // 3. 양쪽 atom이 같은 위치에 있는 edge 제거
+            // 4. 양쪽 atom이 같은 위치에 있는 edge 제거
             edges.removeIf(edge -> {
                 Point2D.Double pos1 = edge.getStartAtom().getPosition();
                 Point2D.Double pos2 = edge.getEndAtom().getPosition();
                 return pos1.distance(pos2) < 1.0;  // 1픽셀 이내면 같은 위치로 간주
             });
 
-            // 4. 같은 위치의 atom 병합
+            // 5. 같은 위치의 atom 병합
             for (int i = atoms.size() - 1; i >= 0; i--) {
                 noteFormulaAtom atom1 = atoms.get(i);
                 for (int j = i - 1; j >= 0; j--) {
@@ -182,7 +205,9 @@ public class noteFormulaMgr {
                     }
                 }
             }
+            
         }
+
     }
 
     private boolean hasSameAtoms(noteFormulaEdge edge1, noteFormulaEdge edge2) {
@@ -209,7 +234,7 @@ public class noteFormulaMgr {
             }
         }
     }
-    
+
     // Formula를 제거하는 메서드
     public void removeFormula(noteFormula formula) {
         // 삭제할 Atom과 Edge 수집
@@ -228,7 +253,6 @@ public class noteFormulaMgr {
         this.mFormulas.remove(formula);
     }
 
-
     // Atom을 완전히 제거하는 메서드
     public void removeAtom(noteFormulaAtom atom) {
         // prevAtoms에서 제거
@@ -244,7 +268,7 @@ public class noteFormulaMgr {
             formula.getAtoms().remove(atom);
         }
     }
-    
+
     // Atom을 완전히 제거하는 메서드
     public void removeEdge(noteFormulaEdge edge) {
         // prevAtoms에서 제거
@@ -261,8 +285,6 @@ public class noteFormulaMgr {
         }
     }
 
-    
-
     public void translateSelectedFormula(double dx, double dy) {
         if (this.mSelectedFormula != null) {
             this.mSelectedFormula.translateTo(dx, dy);
@@ -276,6 +298,4 @@ public class noteFormulaMgr {
 //
 //        
 //    }
-    
-
 }

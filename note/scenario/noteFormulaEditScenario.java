@@ -1,9 +1,11 @@
 package note.scenario;
 
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import note.cmd.noteCmdToCreateAtom;
 import note.noteApp;
 import note.noteFormula;
 import note.noteFormulaAtom;
@@ -12,6 +14,8 @@ import note.noteFormulaMgr;
 import note.notePenMarkMgr;
 import note.noteScene;
 import note.cmd.noteCmdToPromoteEdge;
+import note.noteFormulaAtomTemp;
+import note.noteFormulaEdgeTemp;
 import x.XApp;
 import x.XCmdToChangeScene;
 import x.XScenario;
@@ -120,12 +124,23 @@ public class noteFormulaEditScenario extends XScenario {
                     formulaMgr.setEditingFormula(null);
 
                     // 이전 씬으로 돌아가기
-                    XCmdToChangeScene.execute(note, this.mReturnScene, null);
+                    XCmdToChangeScene.execute(note, 
+                        noteDefaultScenario.ReadyScene.getSingleton(),
+                        null);
                     break;
                 case KeyEvent.VK_E:
                     formulaMgr.removeFormula(formulaMgr.getEditingFormula());
                     formulaMgr.setEditingFormula(null);
-                    XCmdToChangeScene.execute(note, this.mReturnScene, null);
+                    
+                    XCmdToChangeScene.execute(note, 
+                        noteDefaultScenario.ReadyScene.getSingleton(), 
+                        null);
+                    break;
+                case KeyEvent.VK_F:
+                    XCmdToChangeScene.execute(note, 
+                        noteFormulaDrawScenario.FormulaAppendReadyScene.getSingleton(), 
+                        this);
+                    break;
             }
             note.getCanvas2D().repaint();
         }
@@ -483,7 +498,7 @@ public class noteFormulaEditScenario extends XScenario {
             // 제스처가 짧으면 (탭) 바로 리턴
             if (penMarkMgr.wasShortTab() == true) {
                 note.getFormulaMgr().setEditingFormula(null);
-                XCmdToChangeScene.execute(note, this.mReturnScene, null);
+                XCmdToChangeScene.execute(note, noteDefaultScenario.ReadyScene.getSingleton(), null);
                 return;
             }
 
@@ -537,5 +552,6 @@ public class noteFormulaEditScenario extends XScenario {
 
         }
     }
+    
 
 }
