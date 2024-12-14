@@ -106,7 +106,7 @@ public class noteFormulaDrawScenario extends XScenario {
 
             formulaMgr.setCurrAtom(newAtom);
             formulaMgr.setCurrFormula(
-                    formulaMgr.findFormulaForAtom(newAtom));
+                    formulaMgr.findFormulaFor(newAtom));
 
             noteFormulaAtomTemp tempAtom = new noteFormulaAtomTemp("C", point2D);
             formulaMgr.setAtomTemp(tempAtom);
@@ -344,7 +344,7 @@ public class noteFormulaDrawScenario extends XScenario {
                         formulaMgr.addPrevEdge(newEdge);
 
                         // Formula에 Edge 추가
-                        noteFormula sourceFormula = formulaMgr.findFormulaForAtom(currAtom);
+                        noteFormula sourceFormula = formulaMgr.findFormulaFor(currAtom);
                         sourceFormula.addEdge(newEdge);
 
                         // Formula 병합

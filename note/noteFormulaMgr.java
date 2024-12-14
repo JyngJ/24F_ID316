@@ -121,13 +121,23 @@ public class noteFormulaMgr {
 
     // 메서드 
     // 특정 Atom이 속한 Formula를 찾는 메서드
-    public noteFormula findFormulaForAtom(noteFormulaAtom atom) {
+    public noteFormula findFormulaFor(noteFormulaAtom atom) {
         for (noteFormula formula : mFormulas) {
             if (formula.getAtoms().contains(atom)) {
                 return formula; // Atom이 포함된 Formula 반환
             }
         }
         return null; // Atom이 어떤 Formula에도 속하지 않을 경우 null 반환
+    }
+    
+    // 특정 Edge가 속한 Formula를 찾는 메서드
+    public noteFormula findFormulaFor(noteFormulaEdge edge) {
+        for (noteFormula formula : mFormulas) {
+            if (formula.getEdges().contains(edge)) {
+                return formula; // 포함된 Formula 반환
+            }
+        }
+        return null; //어떤 Formula에도 속하지 않을 경우 null 반환
     }
 
     public void arrangeFormulas() {

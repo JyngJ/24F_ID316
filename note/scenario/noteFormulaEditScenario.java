@@ -11,6 +11,7 @@ import note.noteFormulaEdge;
 import note.noteFormulaMgr;
 import note.notePenMarkMgr;
 import note.noteScene;
+import note.cmd.noteCmdToPromoteEdge;
 import x.XApp;
 import x.XCmdToChangeScene;
 import x.XScenario;
@@ -199,6 +200,17 @@ public class noteFormulaEditScenario extends XScenario {
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            notePenMarkMgr penMarkMgr = note.getPenMarkMgr();
+            noteFormulaMgr formulaMgr = note.getFormulaMgr();
+            
+            if (penMarkMgr.wasLastMarkStraight() == true) {
+                noteCmdToPromoteEdge.execute(note, formulaMgr.getEditingEdge());
+                XCmdToChangeScene.execute(note,
+                    noteFormulaEditScenario.noteFormulaEditReadyScene.getSingleton(), this.mReturnScene);
+            }
+            XCmdToChangeScene.execute(note,
+                    noteFormulaEditScenario.noteFormulaEditReadyScene.getSingleton(), this.mReturnScene);
             
         }
 

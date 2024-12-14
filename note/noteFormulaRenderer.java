@@ -76,8 +76,8 @@ public class noteFormulaRenderer {
         Point2D.Double position = atom.getPosition();
 
         if (atom.getType() == "C") {
-            // Atom 위치에 점 그리기
-            g2.fillOval((int) (position.x - 3), (int) (position.y - 3), 6, 6);
+            // Debug: Atom 위치에 점 그리기
+//            g2.fillOval((int) (position.x - 3), (int) (position.y - 3), 6, 6);
         } else {
             g2.setFont(FONT_ATOM);
             g2.drawString(atom.getType(), (float) position.x - 10, (float) position.y + 10);
@@ -145,7 +145,7 @@ public class noteFormulaRenderer {
 
         if (startAtom.getType().equals("C")) {
             // 탄소면 끝까지 선 그리기 
-            start = startAtom.getPosition();
+            start = shortenPosition(startAtom, endAtom, 10);
         } else {
             // 아니라면 선 더 짧게 그리기 
             start = shortenPosition(startAtom, endAtom, 20);
@@ -153,7 +153,7 @@ public class noteFormulaRenderer {
 
         if (endAtom.getType().equals("C")) {
             // 탄소면 끝까지 선 그리기 
-            end = endAtom.getPosition();
+            end = shortenPosition(endAtom, startAtom, 10);
         } else {
             // 아니라면 선 더 짧게 그리기 
             end = shortenPosition(endAtom, startAtom, 20);
@@ -166,8 +166,8 @@ public class noteFormulaRenderer {
         double dx = end.x - start.x;
         double dy = end.y - start.y;
         double length = Math.sqrt(dx * dx + dy * dy);
-        double offsetX = -dy / length * 10; // 수직 벡터 x
-        double offsetY = dx / length * 10;  // 수직 벡터 y
+        double offsetX = -dy / length * 5; // 수직 벡터 x
+        double offsetY = dx / length * 5;  // 수직 벡터 y
 
         // 두 선을 평행하게 그림
         g2.drawLine(
@@ -187,7 +187,7 @@ public class noteFormulaRenderer {
 
         if (startAtom.getType().equals("C")) {
             // 탄소면 끝까지 선 그리기 
-            start = startAtom.getPosition();
+            start = shortenPosition(startAtom, endAtom, 10);
         } else {
             // 아니라면 선 더 짧게 그리기 
             start = shortenPosition(startAtom, endAtom, 20);
@@ -195,7 +195,7 @@ public class noteFormulaRenderer {
 
         if (endAtom.getType().equals("C")) {
             // 탄소면 끝까지 선 그리기 
-            end = endAtom.getPosition();
+            end = shortenPosition(endAtom, startAtom, 10);
         } else {
             // 아니라면 선 더 짧게 그리기 
             end = shortenPosition(endAtom, startAtom, 20);
@@ -208,8 +208,8 @@ public class noteFormulaRenderer {
         double dx = end.x - start.x;
         double dy = end.y - start.y;
         double length = Math.sqrt(dx * dx + dy * dy);
-        double offsetX = -dy / length * 10; // 수직 벡터 x
-        double offsetY = dx / length * 10;  // 수직 벡터 y
+        double offsetX = -dy / length * 5; // 수직 벡터 x
+        double offsetY = dx / length * 5;  // 수직 벡터 y
 
         // 세 선을 평행하게 그림
         g2.drawLine(
