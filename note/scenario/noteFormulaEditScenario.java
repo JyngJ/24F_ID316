@@ -375,12 +375,12 @@ public class noteFormulaEditScenario extends XScenario {
             noteApp note = (noteApp) this.mScenario.getApp();
             Point2D.Double pt = new Point2D.Double(e.getX(), e.getY());
             noteFormulaMgr formulaMgr = note.getFormulaMgr();
+            noteFormulaAtom editingAtom = formulaMgr.getEditingAtom();
 
-            // 드래그 하는 범위가 touchArea를 벗어나면 이동으로 간주, moveScene으로 이동 
-            if (formulaMgr.getEditingAtom().isTouchedBy(pt) != true) {
-                formulaMgr.setEditingAtom(null);
-                XCmdToChangeScene.execute(note,
-                        noteFormulaEditScenario.FormulaMoveScene.getSingleton(), this.mReturnScene);
+            // 드래그 하는 범위가 touchArea를 벗어나면 이동으로 간주
+            if (editingAtom.isTouchedBy(pt) != true) {
+                editingAtom.setPosition(pt);
+                note.getCanvas2D().repaint();
             }
         }
 
@@ -411,13 +411,13 @@ public class noteFormulaEditScenario extends XScenario {
                                 break;
                         }
                         formulaMgr.setEditingAtom(null);
-                        XCmdToChangeScene.execute(note,
-                                noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), this.mReturnScene);
                         return;
                     }
                 }
                 return;
             }
+            XCmdToChangeScene.execute(note,
+                                noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), this.mReturnScene);
         }
 
         @Override
