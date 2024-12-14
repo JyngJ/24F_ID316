@@ -7,6 +7,8 @@ import java.awt.geom.Point2D;
 import note.noteApp;
 import note.noteFormula;
 import note.noteFormulaEdge;
+import note.noteFormulaMgr;
+import note.notePenMarkMgr;
 import note.noteScene;
 import x.XApp;
 import x.XCmdToChangeScene;
@@ -75,6 +77,9 @@ public class noteFormulaEditScenario extends XScenario {
                         XCmdToChangeScene.execute(note,
                                 noteFormulaEditScenario.noteFormulaMoveScene.getSingleton(), this.mReturnScene);
                         return;
+                    } else {
+                        XCmdToChangeScene.execute(note,
+                                noteFormulaEditScenario.noteFormulaGestureScene.getSingleton(), this.mReturnScene);
                     }
                 }
             }
@@ -94,16 +99,22 @@ public class noteFormulaEditScenario extends XScenario {
         public void handleKeyDown(KeyEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
             int code = e.getKeyCode();
-
+            noteFormulaMgr formulaMgr = note.getFormulaMgr();
+            
             switch (code) {
                 case KeyEvent.VK_ESCAPE:
                     // 편집 모드 해제
-                    note.getFormulaMgr().setEditingFormula(null);
+                    formulaMgr.setEditingFormula(null);
 
                     // 이전 씬으로 돌아가기
                     XCmdToChangeScene.execute(note, this.mReturnScene, null);
                     break;
+                case KeyEvent.VK_E:
+                    formulaMgr.removeFormula(formulaMgr.getEditingFormula());
+                    formulaMgr.setEditingFormula(null);
+                    XCmdToChangeScene.execute(note, this.mReturnScene, null);
             }
+            note.getCanvas2D().repaint();
         }
 
         @Override
@@ -128,7 +139,6 @@ public class noteFormulaEditScenario extends XScenario {
 
         @Override
         public void getReady() {
-            // 펜 마크 관리는 이벤트 리스너에서 처리
         }
 
         @Override
@@ -182,7 +192,6 @@ public class noteFormulaEditScenario extends XScenario {
         public void handleMouseRelease(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
 
-            // EditReadyScene으로 돌아가기
             XCmdToChangeScene.execute(note,
                     noteFormulaEditScenario.noteFormulaEditReadyScene.getSingleton(), this.mReturnScene);
 
@@ -298,12 +307,13 @@ public class noteFormulaEditScenario extends XScenario {
         }
     }
 
-    // 지 변환, 삭제가 일어날 씬 
-    // 엣지도, 아톰도 아닌 다른 곳을 릭했을때 이곳으로 들어옴
+    // 나가기 / 엣지 삭제가 일어날 씬 
+    // 엣지도, 아톰도 아닌 다른 곳을 클릭했을때 이곳으로 들어옴
     public static class noteFormulaGestureScene extends noteScene {
 
         // singleton pattern
         private static noteFormulaGestureScene mSingleton = null;
+        private Point2D.Double mStartPt = null;
 
         public static noteFormulaGestureScene getSingleton() {
             assert (noteFormulaGestureScene.mSingleton != null);
@@ -322,7 +332,6 @@ public class noteFormulaEditScenario extends XScenario {
 
         @Override
         public void handleMousePress(MouseEvent e) {
-
         }
 
         @Override
@@ -332,7 +341,30 @@ public class noteFormulaEditScenario extends XScenario {
 
         @Override
         public void handleMouseRelease(MouseEvent e) {
+            noteApp note = (noteApp) this.mScenario.getApp();
+            notePenMarkMgr penMarkMgr = note.getPenMarkMgr();
+            noteFormulaMgr formulaMgr = note.getFormulaMgr();
 
+            // 제스처가 짧으면 (탭) 바로 리턴
+            if (penMarkMgr.wasShortTab() == true) {
+                note.getFormulaMgr().setEditingFormula(null);
+                XCmdToChangeScene.execute(note, this.mReturnScene, null);
+                return;
+            }
+
+//            // 현재 작업 중인 formula의 엣지 삭제 로직
+//            noteFormula editingFormula = formulaMgr.getEditingFormula();
+//            if (editingFormula != null) {
+//                noteFormulaEdge edgeToRemove = formulaMgr.findIntersectingEdge(editingFormula, penMarkMgr.getCurrPenMark());
+//                if (edgeToRemove != null) {
+//                    editingFormula.removeEdge(edgeToRemove);
+//                    note.getCanvas2D().repaint();
+//                }
+//            }
+
+           
+            // 씬 복귀
+            XCmdToChangeScene.execute(note, noteFormulaEditScenario.noteFormulaEditReadyScene.getSingleton(), this.mReturnScene);
         }
 
         @Override

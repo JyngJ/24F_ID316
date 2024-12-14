@@ -437,6 +437,7 @@ public class noteFormulaDrawScenario extends XScenario {
 
             // 작업 상태 초기화
             formulaMgr.clearPrevElements();
+            
             formulaMgr.setCurrFormula(null);
             formulaMgr.setCurrAtom(null);
             formulaMgr.setAtomTemp(null);
