@@ -13,7 +13,8 @@ public class noteFormulaRenderer {
     public static final Color COLOR_FORMULA_TEMP = new Color(192, 192, 192, 192);
     public static final double LENGTH_EDGE_DEFAULT = 100.0;
     public static final float EDGE_STROKE_WIDTH = 4.0f;
-    public static final Font FONT_ATOM = new Font("Arial", Font.BOLD, 24);
+    public static int FONT_SIZE = 24;
+    public static final Font FONT_ATOM = new Font("Arial", Font.BOLD, FONT_SIZE);
 
     // Constructor
     public noteFormulaRenderer(noteApp note, noteCanvas2D canvas) {
@@ -48,6 +49,23 @@ public class noteFormulaRenderer {
         boolean isEditing = (formula == this.mNote.getFormulaMgr().getEditingFormula());
         
         // Default에서 선택된 상태 표시
+        
+        // Atom의 글씨에 ORANGE 테두리 추가
+        for (noteFormulaAtom atom : formula.getAtoms()) {
+            if (formula.getSelectState() == noteFormula.SelectState.SELECTED && !atom.getType().equals("C")) {
+                Point2D.Double position = atom.getPosition();
+                g2.setColor(Color.ORANGE);
+                FontMetrics fm = g2.getFontMetrics(FONT_ATOM);
+                String atomType = atom.getType();
+                int textWidth = fm.stringWidth(atomType);
+                int textHeight = fm.getAscent();
+                int radius = Math.max(textWidth, textHeight) / 2 + 4;
+                g2.fillOval((int) (position.x - radius),
+                            (int) (position.y - radius),
+                            radius * 2, radius * 2);
+            }
+        }
+        
         if (formula.getSelectState() == noteFormula.SelectState.SELECTED) {
             g2.setColor(Color.ORANGE);
             g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH + 4)); // 더 두껍게
