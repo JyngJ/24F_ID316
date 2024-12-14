@@ -13,6 +13,11 @@ public class noteApp extends XApp {
     public noteCanvas2D getCanvas2D() {
         return this.mCanvas2D;
     }
+    
+    private noteBoundingBox mBoundingBox = new noteBoundingBox();
+    public noteBoundingBox getBoundingBox() {
+        return this.mBoundingBox;
+    }
 
     private XScenarioMgr mScenarioMgr = null;
     public noteColorChooser mColorChooser = null;
@@ -73,6 +78,7 @@ public class noteApp extends XApp {
         this.mXform = new noteXform();
         this.mColorChooser = new noteColorChooser();
         this.mPenMarkMgr = new notePenMarkMgr();
+        this.mBoundingBox = new noteBoundingBox();
 
         //connect event listeners
         this.mCanvas2D.addMouseListener(this.mEventListener);

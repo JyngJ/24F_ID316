@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Stroke;
 
-public class noteBoundingBox {
+public class noteBoundingBox extends noteObject {
     private double minX, minY, maxX, maxY;
     private static final Stroke DASHED_STROKE_B = new BasicStroke(
             2f,
@@ -31,5 +31,27 @@ public class noteBoundingBox {
         this.minY = minY;
         this.maxX = maxX;
         this.maxY = maxY;
+    }
+    
+    public double getMinX() {
+        return this.minX;
+    }
+    public double getMinY() {
+        return this.minY;
+    }
+    public double getMaxX() {
+        return this.maxX;
+    }
+    public double getMaxY() {
+        return this.maxY;
+    }
+
+    @Override
+    public void translateTo(double dx, double dy) {
+        this.setBoundingBox(
+        this.getMinX() + dx,
+        this.getMinY() + dy,
+        this.getMaxX() + dx,
+        this.getMaxY() + dy);
     }
 }

@@ -73,9 +73,8 @@ public class notePtCurve extends noteObject {
     @Override
     public void translateTo(double dx, double dy) {
         // 모든 점들의 위치를 이동
-        for (Point2D.Double pt : this.mPts) {
-            pt.x += dx;
-            pt.y += dy;
+        for (Point2D.Double pt : this.getPts()) {
+            pt.setLocation(pt.x + dx, pt.y + dy);
         }
     }
 }

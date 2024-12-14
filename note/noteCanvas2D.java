@@ -12,6 +12,8 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import javax.swing.JPanel;
+import note.noteBoundingBox;
+import note.notePtCurve;
 import note.notePtCurve.SelectState;
 import static note.notePtCurve.SelectState.DEFAULT;
 import static note.notePtCurve.SelectState.ERASE_SELECTED;
@@ -63,6 +65,7 @@ public class noteCanvas2D extends JPanel {
     public Stroke getCurrStrokeForPtCurve() {
         return mCurrStrokeForPtCurve;
     }
+
 
     public noteBoundingBox boundingBox = new noteBoundingBox();
 
@@ -195,18 +198,13 @@ public class noteCanvas2D extends JPanel {
     }
 
     // For Drawing BoundingBox
-    public void drawBoundingBoxForSelectedCurves(Graphics2D g2) {
-        final int GAP = 5;
+    
+    public void updateBoundingBox() {
         if (boundingBox == null) {
             boundingBox = new noteBoundingBox();
         }
         ArrayList<notePtCurve> selectedCurves = new ArrayList<>();
-        for (notePtCurve ptCurve : this.mNote.getPtCurveMgr().getPtCurves()) {
-            if (ptCurve.getSelectState() == SelectState.SELECTED) {
-                selectedCurves.add(ptCurve);
-            }
-        }
-
+        selectedCurves = this.mNote.getPtCurveMgr().getSelectedPtCurves();
         if (!selectedCurves.isEmpty()) {
             // BoundingBox 계산
             double minX = Double.MAX_VALUE, maxX = Double.MIN_VALUE;
@@ -220,17 +218,28 @@ public class noteCanvas2D extends JPanel {
                     maxY = Math.max(maxY, pt.y);
                 }
             }
-
             // BoundingBox 설정
             boundingBox.setBoundingBox(minX, minY, maxX, maxY);
-            boundingBox.draw(g2);
-            drawScaleHandles(g2, minX - GAP, minY - GAP, maxX + GAP, maxY + GAP);
+            this.mNote.getBoundingBox().setBoundingBox(minX, minY, maxX, maxY);
+            System.out.println(minX + ", " + minY + ", " + maxX + ", " + maxY);
+        } else {
+            this.clearBoundingBox();
         }
+    }
+    
+    public void drawBoundingBox(Graphics2D g2) {
+        final int GAP = 5;
+        boundingBox.draw(g2);
+        double minX = boundingBox.getMinX();
+        double minY = boundingBox.getMinY();
+        double maxX = boundingBox.getMaxX();
+        double maxY = boundingBox.getMaxY();
+        drawScaleHandles(g2, minX - GAP, minY - GAP, maxX + GAP, maxY + GAP);
     }
 
     // BoundingBox 지우기
     public void clearBoundingBox() {
-        boundingBox = null;
+        boundingBox.setBoundingBox( -5, -5, -5, -5); // 화면 밖에 그려지도록
         repaint();  // 화면 새로 고침
     }
 
