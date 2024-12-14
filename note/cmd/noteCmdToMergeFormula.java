@@ -51,6 +51,11 @@ public class noteCmdToMergeFormula extends XLoggableCmd {
         for (noteFormulaEdge edge : source.getEdges()) {
             target.addEdge(edge);
         }
+        
+        if (source == formulaMgr.getEditingFormula() || 
+            target == formulaMgr.getEditingFormula()) {
+            formulaMgr.setEditingFormula(target);
+        }
 
         // Source Formula를 Formula List에서 제거
         formulaMgr.getFormulas().remove(source);
