@@ -15,12 +15,12 @@ public class notePtCurveMgr {
         this.mCurrPtCurve = ptCurve;
     }
 
-    private ArrayList<notePtCurve> mPtCurves = null;
+    private ArrayList<notePtCurve> mPtCurves = new ArrayList<>();
 
     public ArrayList<notePtCurve> getPtCurves() {
         return this.mPtCurves;
     }
-    private ArrayList<notePtCurve> mSelectedPtCurves = null;
+    private ArrayList<notePtCurve> mSelectedPtCurves = new ArrayList<>();
 
     public ArrayList<notePtCurve> getSelectedPtCurves() {
         return this.mSelectedPtCurves;
@@ -51,6 +51,10 @@ public class notePtCurveMgr {
         for (notePtCurve curve : this.mSelectedPtCurves) {
             curve.translateTo(dx, dy);
         }
+    }
+    
+    public void resetSelectedCurves() {
+        this.mSelectedPtCurves = new ArrayList<>();
     }
 
 }

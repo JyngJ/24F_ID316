@@ -43,6 +43,7 @@ public class noteCmdToSelectObject extends XLoggableCmd {
             boolean isInside = curve.getPts().stream().allMatch(selectionPath::contains);
             if (isInside) {
                 curve.setSelectState(SelectState.SELECTED);
+                note.getPtCurveMgr().getSelectedPtCurves().add(curve);
             }
         }
 
