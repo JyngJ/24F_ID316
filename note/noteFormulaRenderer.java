@@ -1,7 +1,6 @@
 package note;
 
 import java.awt.*;
-import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
@@ -158,10 +157,10 @@ public class noteFormulaRenderer {
             // 아니라면 선 더 짧게 그리기 
             end = shortenPosition(endAtom, startAtom, 20);
         }
-        
+
         g2.setColor(COLOR_FORMULA_DEFAULT); // Edge 색상
         g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH)); // Edge 굵기
-        
+
         // 수직 벡터 계산
         double dx = end.x - start.x;
         double dy = end.y - start.y;
@@ -200,10 +199,10 @@ public class noteFormulaRenderer {
             // 아니라면 선 더 짧게 그리기 
             end = shortenPosition(endAtom, startAtom, 20);
         }
-        
+
         g2.setColor(COLOR_FORMULA_DEFAULT); // Edge 색상
         g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH)); // Edge 굵기
-        
+
         // 수직 벡터 계산
         double dx = end.x - start.x;
         double dy = end.y - start.y;
@@ -225,7 +224,7 @@ public class noteFormulaRenderer {
                 (int) (end.x + 2 * offsetX), (int) (end.y + 2 * offsetY)
         );
     }
-    
+
     // 주어진 Atom의 위치를 기준으로 방향으로 길이를 줄이는 메서드
     private Point2D.Double shortenPosition(noteFormulaAtom atom, noteFormulaAtom otherAtom, double length) {
         Point2D.Double position = atom.getPosition();
@@ -273,7 +272,7 @@ public class noteFormulaRenderer {
         double angle = Math.atan2(dy, dx); // 현재 각도 (라디안)
 
         ArrayList<noteFormulaEdge> currEdges = mNote.getFormulaMgr().getPrevEdges();
-        if (!currEdges.isEmpty()) {
+        if (!currEdges.isEmpty() && !mNote.getPenMarkMgr().isRecentMovementMinimal()) {
             // 마지막 엣지 가져오기
             noteFormulaEdge lastEdge = currEdges.get(currEdges.size() - 1);
 
@@ -296,11 +295,53 @@ public class noteFormulaRenderer {
 
             // 가까운 각도를 선택
             angle = (diff1 < diff2) ? angle1 : angle2;
-            // // 현재 각도와 가까운 쪽 선택
-            // double diff1 = Math.abs(angle - angle1);
-            // double diff2 = Math.abs(angle - angle2);
+            
+        } else if (!currEdges.isEmpty() && mNote.getPenMarkMgr().isRecentMovementMinimal()){
+            // 마지막 엣지 가져오기
+            noteFormulaEdge lastEdge = currEdges.get(currEdges.size() - 1);
 
-            // angle = (diff1 < diff2) ? angle1 : angle2;
+            // 마지막 엣지의 방향 계산
+            Point2D.Double lastStart = lastEdge.getStartAtom().getPosition();
+            Point2D.Double lastEnd = lastEdge.getEndAtom().getPosition();
+            double lastDx = lastEnd.x - lastStart.x;
+            double lastDy = lastEnd.y - lastStart.y;
+            double lastAngle = Math.atan2(lastDy, lastDx);
+
+            // 허용된 각도 차이 (라디안 단위)
+            double[] angleDifferences = {
+                Math.PI / 3,   // ±120도
+                Math.PI / 2,   // ±90도
+                2 * Math.PI / 3, // ±60도
+                2 * Math.PI / 5  // ±72도
+            };
+
+            // 허용되는 각도 계산
+            ArrayList<Double> allowedAngles = new ArrayList<>();
+            for (double diff : angleDifferences) {
+                allowedAngles.add(lastAngle + diff); // + 방향
+                allowedAngles.add(lastAngle - diff); // - 방향
+            }
+
+            // 현재 각도와 허용 각도의 차이 계산
+            double minDifference = Double.MAX_VALUE;
+            double closestAngle = lastAngle;
+
+            for (double allowedAngle : allowedAngles) {
+                // 각도 차이를 계산 (음수와 양수 구분)
+                double diff = angle - allowedAngle;
+                diff = (diff + Math.PI) % (2 * Math.PI) - Math.PI; // [-π, π]로 정규화
+
+                // 가장 작은 차이를 가진 각도 선택
+                if (Math.abs(diff) < minDifference) {
+                    minDifference = Math.abs(diff);
+                    closestAngle = allowedAngle;
+                }
+            }
+
+            // 최종 선택된 각도로 스냅
+            angle = closestAngle;
+
+
         } else {
             // 엣지가 없는 경우 60도 간격 스냅
             double[] allowedAngles = {
@@ -331,71 +372,5 @@ public class noteFormulaRenderer {
         double snappedDy = length * Math.sin(angle);
 
         return new Point2D.Double(start.x + snappedDx, start.y + snappedDy);
-    }
-
-    public void arrangeFormulas() {
-        noteFormulaMgr formulaMgr = this.mNote.getFormulaMgr();
-        ArrayList<noteFormula> formulas = formulaMgr.getFormulas();
-
-        for (noteFormula formula : formulas) {
-            ArrayList<noteFormulaEdge> edges = formula.getEdges();
-            ArrayList<noteFormulaAtom> atoms = formula.getAtoms();
-
-            // 1. 외따로 있는 atom 제거 (edge가 없는 atom)
-            edges.removeIf(edge -> {
-                return edge.getStartAtom() == null || edge.getEndAtom() == null;
-            });
-
-            // 2. 중복 edge 제거 (같은 atom 쌍을 연결하는 edge)
-            for (int i = edges.size() - 1; i >= 0; i--) {
-                noteFormulaEdge edge1 = edges.get(i);
-                for (int j = i - 1; j >= 0; j--) {
-                    noteFormulaEdge edge2 = edges.get(j);
-                    if (hasSameAtoms(edge1, edge2)) {
-                        edges.remove(i);
-                        break;
-                    }
-                }
-            }
-
-            // 3. 같은 위치의 atom 병합
-            for (int i = atoms.size() - 1; i >= 0; i--) {
-                noteFormulaAtom atom1 = atoms.get(i);
-                for (int j = i - 1; j >= 0; j--) {
-                    noteFormulaAtom atom2 = atoms.get(j);
-                    if (isSamePosition(atom1, atom2)) {
-                        // atom2에 연결된 모든 edge를 atom1으로 연결
-                        redirectEdges(edges, atom2, atom1);
-                        atoms.remove(j);
-                        i--; // 인덱스 조정
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean hasSameAtoms(noteFormulaEdge edge1, noteFormulaEdge edge2) {
-        return (edge1.getStartAtom() == edge2.getStartAtom()
-                && edge1.getEndAtom() == edge2.getEndAtom())
-                || (edge1.getStartAtom() == edge2.getEndAtom()
-                && edge1.getEndAtom() == edge2.getStartAtom());
-    }
-
-    private boolean isSamePosition(noteFormulaAtom atom1, noteFormulaAtom atom2) {
-        Point2D.Double pos1 = atom1.getPosition();
-        Point2D.Double pos2 = atom2.getPosition();
-        return pos1.distance(pos2) < 1.0; // 1픽셀 이내면 같은 위치로 간주
-    }
-
-    private void redirectEdges(ArrayList<noteFormulaEdge> edges,
-            noteFormulaAtom oldAtom, noteFormulaAtom newAtom) {
-        for (noteFormulaEdge edge : edges) {
-            if (edge.getStartAtom() == oldAtom) {
-                edge.setStartAtom(newAtom);
-            }
-            if (edge.getEndAtom() == oldAtom) {
-                edge.setEndAtom(newAtom);
-            }
-        }
     }
 }

@@ -8,21 +8,26 @@ public class notePenMarkMgr {
     private static final int MAX_MARKS = 5;  // 최대 기록 수
     public static final long SHORT_TAB_DURATION = 100; // 0.1초 (밀리초)
     public static final long LONG_PRESS_DURATION = 300; // 0.3초 (밀리초)
-    
+    public static final long RECENT_TIME_WINDOW = 2000; // 최근 2초 기준 (밀리초)
+
+
     // 허용 오차 상수 (직선 판단 기준)
     private static final double STRAIGHT_LINE_MAX_DEVIATION = 10;
-    
+    private static final double MINIMUM_DISTANCE_THRESHOLD = 5.0; // 최소 이동 거리 (픽셀)
+
     private ArrayList<notePenMark> mMarks;   // 최근 펜 마크들
     // 마크 목록 가져오기
+
     public ArrayList<notePenMark> getMarks() {
         return mMarks;
     }
 
     private notePenMark mCurrPenMark;          // 현재 진행 중인 펜 마크
+
     public notePenMark getCurrPenMark() {
         return mCurrPenMark;
     }
-    
+
     public notePenMark getLastPenMark() {
         return mMarks.getLast();
     }
@@ -77,7 +82,7 @@ public class notePenMarkMgr {
         return pressDuration >= LONG_PRESS_DURATION
                 && mCurrPenMark.getTotalDistance() <= 3.0;  // 이동 거리가 작고 오래 눌렀을 때
     }
-    
+
     public boolean wasShortTab() {
         notePenMark lastPM = mMarks.getLast();
         if (lastPM.getDuration() < SHORT_TAB_DURATION) {
@@ -86,7 +91,7 @@ public class notePenMarkMgr {
             return false;
         }
     }
-    
+
     // 이전 펜 마크가 대략적인 직선인지 확인
     public boolean wasLastMarkStraight() {
         if (mMarks.isEmpty()) {
@@ -154,5 +159,25 @@ public class notePenMarkMgr {
                 currPt.y - prevPt.y
         );
     }
+    
+    // 최근 2초 동안 움직임이 적었는지 확인
+    public boolean isRecentMovementMinimal() {
+        long currentTime = System.currentTimeMillis();
+        double totalDistance = 0.0;
 
+        // 최근 2초의 펜 마크 데이터를 확인
+        for (notePenMark mark : mMarks) {
+            if (currentTime - mark.getEndTime() <= RECENT_TIME_WINDOW) {
+                totalDistance += mark.getTotalDistance();
+            }
+        }
+
+        // 현재 진행 중인 펜 마크도 포함
+        if (mCurrPenMark != null && currentTime - mCurrPenMark.getStartTime() <= RECENT_TIME_WINDOW) {
+            totalDistance += mCurrPenMark.getTotalDistance();
+        }
+
+        // 총 이동 거리가 기준보다 작으면 움직임이 적다고 판단
+        return totalDistance < MINIMUM_DISTANCE_THRESHOLD;
+    }
 }

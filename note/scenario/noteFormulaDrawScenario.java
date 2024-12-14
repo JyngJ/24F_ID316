@@ -350,7 +350,7 @@ public class noteFormulaDrawScenario extends XScenario {
                     double distance = Math.sqrt(dx * dx + dy * dy);
 
                     // 거리가 충분할 경우 새 Atom과 Edge 생성
-                    if (distance >= noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 2) {
+                    if (distance >= 4 * noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 5) {
                         // AtomTemp 위치에 새 Atom 생성
                         Point2D.Double tempPos = formulaMgr.getAtopTemp().getPosition();
                         noteFormulaAtom newAtom = noteCmdToCreateAtom.execute(note, tempPos);
@@ -381,7 +381,7 @@ public class noteFormulaDrawScenario extends XScenario {
                             double dy = currentPoint.y - startPos.y;
                             double distance = Math.sqrt(dx * dx + dy * dy);
 
-                            if (distance >= noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 3) {
+                            if (distance >= 2 * noteFormulaRenderer.LENGTH_EDGE_DEFAULT / 3) {
                                 // 이전 상태로 복원
                                 noteFormulaAtom prevAtom = lastPrevEdge.getStartAtom();
 
