@@ -31,7 +31,6 @@ public class noteFormulaMgr {
         this.mPrevEdges = pv;
     }
 
-    private ArrayList<noteFormulaAtom> mPrevAtoms = null;
     public ArrayList<noteFormulaAtom> getPrevAtoms() {
         return this.mPrevAtoms;
     }

@@ -275,10 +275,11 @@ public class noteSelectScenario extends XScenario {
                     XCmdToChangeScene.execute(note,
                             noteDefaultScenario.ReadyScene.getSingleton(), null);
                     break;
-                case KeyEvent.VK_SHIFT:
-                    XCmdToChangeScene.execute(note,
+
+                    case KeyEvent.VK_SHIFT:
+                        XCmdToChangeScene.execute(note,
                             noteSelectScenario.SelectScene.getSingleton(), this);
-                    
+
             }
         }
 
