@@ -57,10 +57,10 @@ public class noteCmdToSelectObject extends XLoggableCmd {
                 } else {
                     isInside = false;
                 }
+            }
             if (isInside) {
                 molecule.setSelectState(noteFormula.SelectState.SELECTED);
                 note.getFormulaMgr().getSelectedFormulas_d().add(molecule);
-            }
             }
         }
         return true;

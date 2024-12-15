@@ -12,8 +12,6 @@ public class noteFormulaMgr {
     // fields
     
     private ArrayList<noteFormulaEdge> mPrevEdges = null;
-
-    private ArrayList<noteFormulaAtom> mPrevAtoms = null;
     
     // for Select
     private ArrayList<noteFormula> mSelectedFormulas_d = new ArrayList<>();
@@ -167,6 +165,7 @@ public class noteFormulaMgr {
 //            if (formula.getEdges().isEmpty()) {
 //                removeFormula(formula);
 //            }
+
             // 3. 중복 edge 제거 (같은 atom 쌍을 연결하는 edge)
             for (int i = edges.size() - 1; i >= 0; i--) {
                 noteFormulaEdge edge1 = edges.get(i);

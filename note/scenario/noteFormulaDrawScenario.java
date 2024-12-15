@@ -95,7 +95,7 @@ public class noteFormulaDrawScenario extends XScenario {
                         // 씬 전환
                         XCmdToChangeScene.execute(note,
                                 noteFormulaDrawScenario.FormulaDrawScene.getSingleton(),
-                                this.mReturnScene);
+                                this);
                         return;
                     }
                 }
@@ -116,7 +116,7 @@ public class noteFormulaDrawScenario extends XScenario {
             // 씬 전환
             XCmdToChangeScene.execute(note,
                     noteFormulaDrawScenario.FormulaDrawScene.getSingleton(),
-                    this.mReturnScene);
+                    this);
         }
 
         @Override
@@ -141,7 +141,7 @@ public class noteFormulaDrawScenario extends XScenario {
             switch (code) {
                 case KeyEvent.VK_F:             // will be changed
                     XCmdToChangeScene.execute(note,
-                            mReturnScene, null);
+                            noteDefaultScenario.ReadyScene.getSingleton(), null);
                     break;
             }
         }
@@ -218,7 +218,7 @@ public class noteFormulaDrawScenario extends XScenario {
                         // 씬 전환
                         XCmdToChangeScene.execute(note,
                                 noteFormulaDrawScenario.FormulaDrawScene.getSingleton(),
-                                this.mReturnScene);
+                                this);
                         return;
                     }
                 }
@@ -247,7 +247,7 @@ public class noteFormulaDrawScenario extends XScenario {
             switch (code) {
                 case KeyEvent.VK_F:
                     XCmdToChangeScene.execute(note,
-                            mReturnScene, null);
+                            noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), null);
                     break;
             }
         }
@@ -460,8 +460,8 @@ public class noteFormulaDrawScenario extends XScenario {
 
                         // 씬 전환
                         XCmdToChangeScene.execute(note,
-                                noteFormulaDrawScenario.FormulaReadyScene.getSingleton(),
-                                this.mReturnScene);
+                                this.mReturnScene,
+                                null);
                         return;
                     }
                 }
@@ -475,11 +475,17 @@ public class noteFormulaDrawScenario extends XScenario {
             noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, newAtom);
             formulaMgr.addPrevEdge(newEdge);
             formulaMgr.addPrevAtom(newAtom);
+            
+            if (formulaMgr.getEditingFormula() != null) {
+                XCmdToChangeScene.execute(note,
+                            noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), null);
+            } else {
+                XCmdToChangeScene.execute(note,
+                            noteDefaultScenario.ReadyScene.getSingleton(), null);
+            }
 
             // 씬 전환
-            XCmdToChangeScene.execute(note,
-                    noteFormulaDrawScenario.FormulaReadyScene.getSingleton(),
-                    this.mReturnScene);
+            
         }
 
         @Override
@@ -497,7 +503,7 @@ public class noteFormulaDrawScenario extends XScenario {
                     formulaMgr.setAtomTemp(null);
                     formulaMgr.setEdgeTemp(null);
                     XCmdToChangeScene.execute(note,
-                            mReturnScene, null);
+                            this.mReturnScene, null);
                     break;
             }
         }
@@ -533,8 +539,23 @@ public class noteFormulaDrawScenario extends XScenario {
                 for (noteFormulaEdge edge : formulaMgr.getPrevEdges()) {
                     currFormula.addEdge(edge);
                 }
+
+                // 복사본을 사용해 안전하게 Formula를 병합 
+                // atom이 단독으로 formula로 되어있는 경우 검사 
+                ArrayList<noteFormula> formulasToRemove = new ArrayList<>();
                 for (noteFormulaAtom atom : formulaMgr.getPrevAtoms()) {
-                    currFormula.addAtom(atom);
+                    noteFormula sourceFormula = formulaMgr.findFormulaFor(atom);
+
+                    if (sourceFormula != null && sourceFormula != currFormula) {
+                        formulasToRemove.add(sourceFormula); // 삭제 대상 Formula를 추가
+                    }
+
+                    currFormula.addAtom(atom); // 현재 Formula에 Atom 추가
+                }
+
+                // Formula 병합 및 삭제
+                for (noteFormula sourceFormula : formulasToRemove) {
+                    noteCmdToMergeFormula.execute(note, sourceFormula, currFormula);
                 }
             }
 
@@ -543,12 +564,13 @@ public class noteFormulaDrawScenario extends XScenario {
 
             // 작업 상태 초기화
             formulaMgr.clearPrevElements();
-            
+
             formulaMgr.setCurrFormula(null);
             formulaMgr.setCurrAtom(null);
             formulaMgr.setAtomTemp(null);
             formulaMgr.setEdgeTemp(null);
-        }
+            }
     }
+
 
 }

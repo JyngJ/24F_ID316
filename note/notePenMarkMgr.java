@@ -80,7 +80,7 @@ public class notePenMarkMgr {
         }
         long pressDuration = System.currentTimeMillis() - mCurrPenMark.getStartTime();
         return pressDuration >= LONG_PRESS_DURATION
-                && mCurrPenMark.getTotalDistance() <= 3.0;  // 이동 거리가 작고 오래 눌렀을 때
+                && mCurrPenMark.getTotalDistance() <= 30.0;  // 이동 거리가 작고 오래 눌렀을 때
     }
 
     public boolean wasShortTab() {
