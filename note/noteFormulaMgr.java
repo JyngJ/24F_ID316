@@ -12,8 +12,6 @@ public class noteFormulaMgr {
     // fields
     
     private ArrayList<noteFormulaEdge> mPrevEdges = null;
-
-    private ArrayList<noteFormulaAtom> mPrevAtoms = null;
     
     // for Select
     private ArrayList<noteFormula> mSelectedFormulas_d = new ArrayList<>();

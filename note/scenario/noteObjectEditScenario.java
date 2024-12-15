@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import note.cmd.noteCmdToScaleObject;
 import note.noteApp;
+import note.noteFormula;
 import note.noteObject;
 import note.notePenMarkMgr;
 import note.notePtCurve;
@@ -76,15 +77,28 @@ public class noteObjectEditScenario extends XScenario {
             this.prevPt = currPt;
 
             System.out.println("Dragging: dx=" + dx + ", dy=" + dy);
-
-            // Move selected objects
+            
+            //Move selected Formulas
+            ArrayList<noteFormula> selectedFormulas =
+                note.getFormulaMgr().getSelectedFormulas_d();
+             if (note.getPenMarkMgr().isDragging()) {
+                Point2D.Double relativeDistance = note.getPenMarkMgr().getRelativeDistance();
+                if (relativeDistance != null) {
+                   for (noteFormula formula : selectedFormulas) {
+                        formula.translateTo(relativeDistance.x, relativeDistance.y);
+                }
+                }
+             }
+            System.out.println(dx + ", " +dy);
+            
+            // Move selected Curves
             ArrayList<notePtCurve> selectedCurves =
                 note.getPtCurveMgr().getSelectedPtCurves();
             for (notePtCurve curve : selectedCurves) {
                 curve.translateTo(dx, dy);
             }
-            note.getBoundingBox().translateTo(dx, dy);
-
+            System.out.println(dx + ", " +dy);
+            
             // Update BoundingBox
             note.getCanvas2D().updateBoundingBox();
             note.getCanvas2D().repaint();
