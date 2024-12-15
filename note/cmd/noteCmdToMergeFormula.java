@@ -34,7 +34,7 @@ public class noteCmdToMergeFormula extends XLoggableCmd {
 
         // 같은 Formula라면 병합하지 않음
         if (sourceFormula == targetFormula) {
-            System.out.println("Source and Target Formulas are the same. No merge performed.");
+//            System.out.println("Source and Target Formulas are the same. No merge performed.");
             return true;
         }
 
@@ -56,11 +56,9 @@ public class noteCmdToMergeFormula extends XLoggableCmd {
             target == formulaMgr.getEditingFormula()) {
             formulaMgr.setEditingFormula(target);
         }
-
         // Source Formula를 Formula List에서 제거
         formulaMgr.getFormulas().remove(source);
-
-        System.out.println("Merged Source Formula into Target Formula.");
+        
     }
 
     @Override

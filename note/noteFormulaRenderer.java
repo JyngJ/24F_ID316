@@ -112,9 +112,9 @@ public class noteFormulaRenderer {
         }
 
         // 디버깅용 라벨 "A" 표시
-        g2.setColor(Color.RED);
-        g2.setFont(new Font("Arial", Font.PLAIN, 12));
-        g2.drawString("A", (float) position.x + 5, (float) position.y - 5);
+//        g2.setColor(Color.RED);
+//        g2.setFont(new Font("Arial", Font.PLAIN, 12));
+//        g2.drawString("A", (float) position.x + 5, (float) position.y - 5);
     }
 
     // Edge 그리기
@@ -132,12 +132,12 @@ public class noteFormulaRenderer {
                 drawEdgeTriple(g2, start, end);
         }
 
-        // 디버깅용 라벨 "E" 표시
-        g2.setColor(Color.RED);
-        g2.setFont(new Font("Arial", Font.PLAIN, 12));
-        double midX = (start.getPosition().x + end.getPosition().x) / 2;
-        double midY = (start.getPosition().y + end.getPosition().y) / 2;
-        g2.drawString("E", (float) midX + 5, (float) midY - 5);
+//        // 디버깅용 라벨 "E" 표시
+//        g2.setColor(Color.RED);
+//        g2.setFont(new Font("Arial", Font.PLAIN, 12));
+//        double midX = (start.getPosition().x + end.getPosition().x) / 2;
+//        double midY = (start.getPosition().y + end.getPosition().y) / 2;
+//        g2.drawString("E", (float) midX + 5, (float) midY - 5);
     }
 
     // 단일 결합 Edge
@@ -286,10 +286,10 @@ public class noteFormulaRenderer {
             g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH));
             g2.drawLine((int) start.x, (int) start.y, (int) end.x, (int) end.y);
 
-            // 터치 영역 시각화
-            g2.setColor(new Color(255, 0, 0, 50));
-            g2.setStroke(new BasicStroke(1));
-            g2.draw(tempEdge.getTouchArea());
+//            // 터치 영역 시각화
+//            g2.setColor(new Color(255, 0, 0, 50));
+//            g2.setStroke(new BasicStroke(1));
+//            g2.draw(tempEdge.getTouchArea());
         }
     }
 

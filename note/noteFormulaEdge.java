@@ -3,7 +3,7 @@ package note;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
 
-public abstract class noteFormulaEdge {
+public abstract class noteFormulaEdge extends noteObject {
 
     // 시작 Atom
     private noteFormulaAtom startAtom = null;
@@ -147,4 +147,9 @@ public abstract class noteFormulaEdge {
         // 터치 영역 업데이트
         this.touchArea = calculateTouchArea(start, end);
     }
+    
+    public void scaleTo(double sf, Point2D.Double topLeft) {
+        // 미구현 
+    }
+        
 }
