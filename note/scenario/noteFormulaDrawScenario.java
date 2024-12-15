@@ -533,8 +533,23 @@ public class noteFormulaDrawScenario extends XScenario {
                 for (noteFormulaEdge edge : formulaMgr.getPrevEdges()) {
                     currFormula.addEdge(edge);
                 }
+
+                // 복사본을 사용해 안전하게 Formula를 병합 
+                // atom이 단독으로 formula로 되어있는 경우 검사 
+                ArrayList<noteFormula> formulasToRemove = new ArrayList<>();
                 for (noteFormulaAtom atom : formulaMgr.getPrevAtoms()) {
-                    currFormula.addAtom(atom);
+                    noteFormula sourceFormula = formulaMgr.findFormulaFor(atom);
+
+                    if (sourceFormula != null && sourceFormula != currFormula) {
+                        formulasToRemove.add(sourceFormula); // 삭제 대상 Formula를 추가
+                    }
+
+                    currFormula.addAtom(atom); // 현재 Formula에 Atom 추가
+                }
+
+                // Formula 병합 및 삭제
+                for (noteFormula sourceFormula : formulasToRemove) {
+                    noteCmdToMergeFormula.execute(note, sourceFormula, currFormula);
                 }
             }
 
@@ -543,12 +558,13 @@ public class noteFormulaDrawScenario extends XScenario {
 
             // 작업 상태 초기화
             formulaMgr.clearPrevElements();
-            
+
             formulaMgr.setCurrFormula(null);
             formulaMgr.setCurrAtom(null);
             formulaMgr.setAtomTemp(null);
             formulaMgr.setEdgeTemp(null);
-        }
+            }
     }
+
 
 }

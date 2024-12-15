@@ -42,6 +42,7 @@ public class noteCmdToCreateAtom extends XLoggableCmd {
         formulaMgr.getFormulas().add(newFormula);
 
         System.out.println("Created Atom at " + position + " and added to a new Formula.");
+        System.out.println(newFormula);
 
         return true;
     }
