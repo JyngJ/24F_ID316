@@ -7,20 +7,20 @@ import note.notePtCurve;
 import x.XApp;
 import x.XLoggableCmd;
 
-public class noteCmdToFreeDrawing extends XLoggableCmd {
+public class noteCmdToDrawPtCurve extends XLoggableCmd {
     // fields 
     private Point mScreenPt = null;
     private Point2D.Double mWorldPt = null;
     private notePtCurve mPtCurve = null;
     
     // private constructor
-    private noteCmdToFreeDrawing(XApp app, Point pt) {
+    private noteCmdToDrawPtCurve(XApp app, Point pt) {
         super(app);
         this.mScreenPt = pt;
     }
     
     public static boolean execute(XApp app, Point pt) {
-        noteCmdToFreeDrawing cmd = new noteCmdToFreeDrawing(app, pt);
+        noteCmdToDrawPtCurve cmd = new noteCmdToDrawPtCurve(app, pt);
         return cmd.execute();
     }
     
