@@ -95,7 +95,7 @@ public class noteFormulaDrawScenario extends XScenario {
                         // 씬 전환
                         XCmdToChangeScene.execute(note,
                                 noteFormulaDrawScenario.FormulaDrawScene.getSingleton(),
-                                this.mReturnScene);
+                                this);
                         return;
                     }
                 }
@@ -116,7 +116,7 @@ public class noteFormulaDrawScenario extends XScenario {
             // 씬 전환
             XCmdToChangeScene.execute(note,
                     noteFormulaDrawScenario.FormulaDrawScene.getSingleton(),
-                    this.mReturnScene);
+                    this);
         }
 
         @Override
@@ -141,7 +141,7 @@ public class noteFormulaDrawScenario extends XScenario {
             switch (code) {
                 case KeyEvent.VK_F:             // will be changed
                     XCmdToChangeScene.execute(note,
-                            mReturnScene, null);
+                            noteDefaultScenario.ReadyScene.getSingleton(), null);
                     break;
             }
         }
@@ -218,7 +218,7 @@ public class noteFormulaDrawScenario extends XScenario {
                         // 씬 전환
                         XCmdToChangeScene.execute(note,
                                 noteFormulaDrawScenario.FormulaDrawScene.getSingleton(),
-                                this.mReturnScene);
+                                this);
                         return;
                     }
                 }
@@ -247,7 +247,7 @@ public class noteFormulaDrawScenario extends XScenario {
             switch (code) {
                 case KeyEvent.VK_F:
                     XCmdToChangeScene.execute(note,
-                            mReturnScene, null);
+                            noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), null);
                     break;
             }
         }
@@ -460,8 +460,8 @@ public class noteFormulaDrawScenario extends XScenario {
 
                         // 씬 전환
                         XCmdToChangeScene.execute(note,
-                                noteFormulaDrawScenario.FormulaReadyScene.getSingleton(),
-                                this.mReturnScene);
+                                this.mReturnScene,
+                                null);
                         return;
                     }
                 }
@@ -475,11 +475,17 @@ public class noteFormulaDrawScenario extends XScenario {
             noteFormulaEdgeSingle newEdge = new noteFormulaEdgeSingle(currAtom, newAtom);
             formulaMgr.addPrevEdge(newEdge);
             formulaMgr.addPrevAtom(newAtom);
+            
+            if (formulaMgr.getEditingFormula() != null) {
+                XCmdToChangeScene.execute(note,
+                            noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), null);
+            } else {
+                XCmdToChangeScene.execute(note,
+                            noteDefaultScenario.ReadyScene.getSingleton(), null);
+            }
 
             // 씬 전환
-            XCmdToChangeScene.execute(note,
-                    noteFormulaDrawScenario.FormulaReadyScene.getSingleton(),
-                    this.mReturnScene);
+            
         }
 
         @Override
@@ -497,7 +503,7 @@ public class noteFormulaDrawScenario extends XScenario {
                     formulaMgr.setAtomTemp(null);
                     formulaMgr.setEdgeTemp(null);
                     XCmdToChangeScene.execute(note,
-                            mReturnScene, null);
+                            this.mReturnScene, null);
                     break;
             }
         }

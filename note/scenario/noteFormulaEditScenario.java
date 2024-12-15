@@ -82,7 +82,7 @@ public class noteFormulaEditScenario extends XScenario {
                         // Edge가 터치되면 Scene으로 전환
                         formulaMgr.setEditingEdge(edge);
                         XCmdToChangeScene.execute(note,
-                                noteFormulaEditScenario.FormulaEdgeEditScene.getSingleton(), this.mReturnScene);
+                                noteFormulaEditScenario.FormulaEdgeEditScene.getSingleton(), this);
                         return;
                     }
                 }
@@ -91,13 +91,13 @@ public class noteFormulaEditScenario extends XScenario {
                         // Atom이 터치되면 AtomEditScene으로 전환 
                         formulaMgr.setEditingAtom(atom);
                         XCmdToChangeScene.execute(note,
-                                noteFormulaEditScenario.FormulaAtomEditScene.getSingleton(), this.mReturnScene);        //여기 
+                                noteFormulaEditScenario.FormulaAtomEditScene.getSingleton(), this);        //여기 
                         return;
                     }
                 }
             }
             XCmdToChangeScene.execute(note,
-                    noteFormulaEditScenario.FormulaGestureScene.getSingleton(), this.mReturnScene);
+                    noteFormulaEditScenario.FormulaGestureScene.getSingleton(), this);
         }
 
         @Override
@@ -221,10 +221,10 @@ public class noteFormulaEditScenario extends XScenario {
             if (penMarkMgr.wasLastMarkStraight() == true) {
                 noteCmdToPromoteEdge.execute(note, formulaMgr.getEditingEdge());
                 XCmdToChangeScene.execute(note,
-                        noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), this.mReturnScene);
+                        this.mReturnScene, null);
             }
             XCmdToChangeScene.execute(note,
-                    noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), this.mReturnScene);
+                    this.mReturnScene, null);
 
         }
 
@@ -303,7 +303,7 @@ public class noteFormulaEditScenario extends XScenario {
             noteApp note = (noteApp) this.mScenario.getApp();
 
             XCmdToChangeScene.execute(note,
-                    noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), this.mReturnScene);
+                    this.mReturnScene, null);
 
             note.getCanvas2D().repaint();
         }
@@ -417,7 +417,7 @@ public class noteFormulaEditScenario extends XScenario {
                 return;
             }
             XCmdToChangeScene.execute(note,
-                                noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), this.mReturnScene);
+                                this.mReturnScene, null);
         }
 
         @Override
@@ -519,7 +519,7 @@ public class noteFormulaEditScenario extends XScenario {
             if(formulaMgr.getEditingFormula() == null){
                 XCmdToChangeScene.execute(note, noteDefaultScenario.ReadyScene.getSingleton(), null);
             } else {
-                XCmdToChangeScene.execute(note, noteFormulaEditScenario.FormulaEditReadyScene.getSingleton(), this.mReturnScene);
+                XCmdToChangeScene.execute(note, this.mReturnScene, null);
             }
         }
 

@@ -3,7 +3,7 @@ package note;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
-public class noteFormulaAtom {
+public class noteFormulaAtom extends noteObject {
 
     // Atom 종류 (C, O, N 등)
     private String atomType;
@@ -80,6 +80,16 @@ public class noteFormulaAtom {
             // 새로운 위치로 이동
             touchArea.setFrame(x + dx, y + dy, width, height);
         }
+    }
+
+    @Override
+    public void translateTo(double dx, double dy) {
+        // FormulaMgr에서 구현
+    }
+
+    @Override
+    public void scaleTo(double sf, Point2D.Double topLeft) {
+        // 크기 변화 구현 X 
     }
 
 }
