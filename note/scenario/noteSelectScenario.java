@@ -189,6 +189,8 @@ public class noteSelectScenario extends XScenario {
             note.getPenMarkMgr().startMark(new Point2D.Double(e.getX(), e.getY()));
             ArrayList<notePtCurve> selectedCurves =
                     note.getPtCurveMgr().getPtCurves();
+            ArrayList<noteFormula> selectedMolecules =
+                    note.getFormulaMgr().getSelectedFormulas_d();
             
             if (pt.x > maxX - HANDLE_RANGE && pt.x < maxX + HANDLE_RANGE &&
                 pt.y > maxY - HANDLE_RANGE && pt.y < maxY +HANDLE_RANGE) {
@@ -204,6 +206,10 @@ public class noteSelectScenario extends XScenario {
                         ptCurve.setSelectState(SelectState.DEFAULT);
                     }
                     note.getPtCurveMgr().resetSelectedCurves();
+                    for (noteFormula molecule : selectedMolecules) {
+                        molecule.setSelectState(DEFAULT);
+                    note.getFormulaMgr().resetSelectedFormulas_d();
+                    }
                     note.getCanvas2D().updateBoundingBox();
                     note.getCanvas2D().repaint();
                     XCmdToChangeScene.execute(note,

@@ -11,7 +11,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import note.cmd.noteCmdToCreatePtCurve;
 import note.cmd.noteCmdToErasePtCurve;
-import note.cmd.noteCmdToFreeDrawing;
+import note.cmd.noteCmdToDrawPtCurve;
 import note.noteApp;
 import note.notePtCurve;
 import note.notePtCurveMgr;
@@ -68,7 +68,7 @@ public class noteDrawScenario extends XScenario {
         public void handleMouseDrag(MouseEvent e) {
             noteApp note = (noteApp) this.mScenario.getApp();
             Point pt = e.getPoint();
-            noteCmdToFreeDrawing.execute(note, pt);
+            noteCmdToDrawPtCurve.execute(note, pt);
             note.getCanvas2D().repaint();
         }
 

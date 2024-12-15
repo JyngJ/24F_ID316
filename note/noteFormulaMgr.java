@@ -11,6 +11,8 @@ public class noteFormulaMgr {
 
     // fields
     
+    private ArrayList<noteFormulaAtom> mPrevAtoms = null;
+    
     private ArrayList<noteFormulaEdge> mPrevEdges = null;
     
     // for Select
