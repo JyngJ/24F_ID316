@@ -178,6 +178,8 @@ public class notePenMarkMgr {
         }
 
         // 총 이동 거리가 기준보다 작으면 움직임이 적다고 판단
-        return totalDistance < MINIMUM_DISTANCE_THRESHOLD;
+//        return totalDistance < MINIMUM_DISTANCE_THRESHOLD;
+        // 수정예정 
+        return false;
     }
 }

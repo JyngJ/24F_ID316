@@ -378,9 +378,14 @@ public class noteFormulaEditScenario extends XScenario {
             noteFormulaAtom editingAtom = formulaMgr.getEditingAtom();
 
             // 드래그 하는 범위가 touchArea를 벗어나면 이동으로 간주
-            if (editingAtom.isTouchedBy(pt) != true) {
-                editingAtom.setPosition(pt);
-                note.getCanvas2D().repaint();
+            if (editingAtom != null) {
+                if (editingAtom.isTouchedBy(pt) != true) {
+                    editingAtom.setPosition(pt);
+                    note.getCanvas2D().repaint();
+                }
+            } else {
+                XCmdToChangeScene.execute(note,
+                                this.mReturnScene, null);
             }
         }
 
