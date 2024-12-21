@@ -42,31 +42,49 @@ public abstract class noteFormulaEdge extends noteObject {
     }
 
     // 터치 영역 계산 메서드
+    // 터치 영역 계산 메서드
     private Polygon calculateTouchArea(Point2D.Double start, Point2D.Double end) {
         // 엣지의 방향 벡터 계산
         double dx = end.x - start.x;
         double dy = end.y - start.y;
         double length = Math.sqrt(dx * dx + dy * dy);
 
+        // 방향 벡터 정규화
+        if (length != 0) {
+            dx /= length;
+            dy /= length;
+        }
+
+        // 시작점과 끝점을 10만큼 줄인 위치 계산
+        Point2D.Double adjustedStart = new Point2D.Double(
+            start.x + dx * 10,
+            start.y + dy * 10
+        );
+        Point2D.Double adjustedEnd = new Point2D.Double(
+            end.x - dx * 10,
+            end.y - dy * 10
+        );
+
         // 방향에 수직인 벡터 계산
-        double perpX = -dy / length * (noteCanvas2D.EDGE_TOUCH_AREA_WIDTH / 2);
-        double perpY = dx / length * (noteCanvas2D.EDGE_TOUCH_AREA_WIDTH / 2);
+        double perpX = -dy * (noteCanvas2D.EDGE_TOUCH_AREA_WIDTH / 2);
+        double perpY = dx * (noteCanvas2D.EDGE_TOUCH_AREA_WIDTH / 2);
 
         // 사각형의 네 꼭지점 계산
         int[] xPoints = new int[4];
         int[] yPoints = new int[4];
 
-        xPoints[0] = (int) (start.x + perpX);
-        yPoints[0] = (int) (start.y + perpY);
-        xPoints[1] = (int) (start.x - perpX);
-        yPoints[1] = (int) (start.y - perpY);
-        xPoints[2] = (int) (end.x - perpX);
-        yPoints[2] = (int) (end.y - perpY);
-        xPoints[3] = (int) (end.x + perpX);
-        yPoints[3] = (int) (end.y + perpY);
+        xPoints[0] = (int) (adjustedStart.x + perpX);
+        yPoints[0] = (int) (adjustedStart.y + perpY);
+        xPoints[1] = (int) (adjustedStart.x - perpX);
+        yPoints[1] = (int) (adjustedStart.y - perpY);
+        xPoints[2] = (int) (adjustedEnd.x - perpX);
+        yPoints[2] = (int) (adjustedEnd.y - perpY);
+        xPoints[3] = (int) (adjustedEnd.x + perpX);
+        yPoints[3] = (int) (adjustedEnd.y + perpY);
 
         return new Polygon(xPoints, yPoints, 4);
     }
+
 
     public noteFormulaAtom getStartAtom() {
         return startAtom;

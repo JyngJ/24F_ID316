@@ -9,11 +9,9 @@ public class noteFormulaMgr {
     public static final double ANGLE_SNAP = 120.0; // 스냅 각도 (120도)
     public static final long LONG_PRESS_DURATION = 500; // 0.5초 (밀리초)
 
-    // fields
-    
-    private ArrayList<noteFormulaAtom> mPrevAtoms = null;
-    
+    // fields    
     private ArrayList<noteFormulaEdge> mPrevEdges = null;
+    private ArrayList<noteFormulaAtom> mPrevAtoms = null;
     
     // for Select
     private ArrayList<noteFormula> mSelectedFormulas_d = new ArrayList<>();
